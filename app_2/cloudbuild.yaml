@@ -10,8 +10,8 @@ steps:
          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/app2/app2-image',
          '--platform', 'managed',
          '--region', 'europe-west1',
-         '--allow-unauthenticated',
-         '--port', '5050']
+         '--allow-unauthenticated']
+       #  '--port', '5050']
 
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
