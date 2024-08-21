@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-central2-docker.pkg.dev/tomastestproject-433206/app2/app2-image', '-f', 'app2/Dockerfile', 'app2']
+  args: ['build', '-t', 'europe-central2-docker.pkg.dev/tomastestproject-433206/app2/app2-image', '-f', 'app_2/Dockerfile', 'app_2']
   #Adressen kommer ifrån ditt Artifact Repo. "my-image3" är namnet på imagen.
   #'app/Dockerfile' anger vart i repot dockerfilen finns. 'app' anger från vilken mapp dockerfilen "läser" ifrån.
 - name: 'gcr.io/cloud-builders/docker'        
