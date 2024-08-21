@@ -12,7 +12,7 @@ RUN pip install -r req.txt
 COPY . .
 
 # Exponera porten som Flask använder
-EXPOSE 8080
+EXPOSE 5000
 
 # Starta Flask-applikationen
 CMD ["python", "app.py"]
