@@ -1,3 +1,4 @@
+#Använd alltid belgien som region!!!
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3', '-f', 'app/Dockerfile', 'app']

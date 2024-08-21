@@ -1,15 +1,15 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-central2-docker.pkg.dev/tomastestproject-433206/app2/app2-image', '-f', 'app_2/Dockerfile', 'app_2']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/app2/app2-image', '-f', 'app_2/Dockerfile', 'app_2']
   #Adressen kommer ifrån ditt Artifact Repo. "my-image3" är namnet på imagen.
   #'app/Dockerfile' anger vart i repot dockerfilen finns. 'app' anger från vilken mapp dockerfilen "läser" ifrån.
 - name: 'gcr.io/cloud-builders/docker'        
-  args: ['push', 'europe-central2-docker.pkg.dev/tomastestproject-433206/app2/app2-image']
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/app2/app2-image']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'my-flask-app2',
-         '--image', 'europe-central2-docker.pkg.dev/tomastestproject-433206/app2/app2-image',
+         '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/app2/app2-image',
          '--platform', 'managed',
-         '--region', 'europe-central2',
+         '--region', 'europe-west1',
          '--allow-unauthenticated']
 
 options:
