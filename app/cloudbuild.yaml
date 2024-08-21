@@ -1,8 +1,8 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/$tomastestproject-433206/test/my-image', '.']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/$tomastestproject-433206/test/my-image', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push','us-central1-docker.pkg.dev/$tomastestproject-433206/test/my-image', '.']
+  args: ['push','europe-west1-docker.pkg.dev/$tomastestproject-433206/test/my-image', '.']
 
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
