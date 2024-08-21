@@ -18,12 +18,12 @@
 
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image', '-f', 'app/Dockerfile', 'app']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3', '-f', 'app/Dockerfile', 'app']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image2']
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'my-flask-app',
-         '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image2',
+         '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3',
          '--platform', 'managed',
          '--region', 'europe-west1',
          '--allow-unauthenticated']
