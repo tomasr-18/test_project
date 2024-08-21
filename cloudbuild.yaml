@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test/my-image', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push','europe-north1-docker.pkg.dev/tomastestproject-433206/test/my-image']
+  args: ['push','europe-north1-docker.pkg.dev/tomastestproject-433206/test/']
  # args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test/my-image']
 
 options:
