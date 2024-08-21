@@ -12,7 +12,7 @@ steps:
          '--region', 'europe-west1',
          '--allow-unauthenticated']
 
-options:
+options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
 #Kolla upp detta så vi i framtiden sparar loggarna.
