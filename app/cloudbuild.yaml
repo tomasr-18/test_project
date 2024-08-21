@@ -1,9 +1,9 @@
 steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image', '-f', 'app/Dockerfile', '.']
 - name: 'alpine'
   entrypoint: 'sh'
   args: ['-c', 'ls -l /workspace']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image', '-f', 'app/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test2/my-image']
 
