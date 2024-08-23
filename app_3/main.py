@@ -4,7 +4,7 @@ from google.cloud import bigquery
 
 def write(table_id:str):
 
-    # Initiera BigQuery-klienten
+    # Ladda miljövariabler från .env-filen
     client = bigquery.Client()
 
     # Definiera din dataset och tabell

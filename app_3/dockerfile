@@ -12,5 +12,4 @@ RUN pip install -r req.txt
 EXPOSE 80 
 
 
-# Run app.py when the container launches
 CMD ["python", "app_3.py"]

@@ -17,7 +17,7 @@ steps:
 secrets:
   - kmsKeyName: "projects/tomastestproject-433206/locations/global/keyRings/secrets-keyring/cryptoKeys/secrets-key"
     secretEnv:
-      GOOGLE_APPLICATION_CREDENTIALS: YOUR_SECRET_NAME # Replace with the actual name of your secret in Secret Manager
+      GOOGLE_APPLICATION_CREDENTIALS: hardek00bigquerry # Replace with the actual name of your secret in Secret Manager
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
