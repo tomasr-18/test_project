@@ -5,7 +5,8 @@ from google.cloud import bigquery
 def write(data,table='test_table',project_id='tomastestproject-433206',dataset='testdb_1')->None:
 
     # Initiera BigQuery-klienten
-    client = bigquery.Client()
+    client = bigquery.Client.from_service_account_json(
+        '/Users/tomasrydenstam/Downloads/tomastestproject-433206-adc5bc090976.json')
 
     # Definiera din dataset och tabell
     table_id = f"{project_id}.{dataset}.{table}"
@@ -24,24 +25,6 @@ def write(data,table='test_table',project_id='tomastestproject-433206',dataset='
         print("Data skickades till BigQuery!")
     else:
         print("Följande fel uppstod:", errors)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def get_data(api_key:str,date=None):
