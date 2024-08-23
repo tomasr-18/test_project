@@ -3,7 +3,7 @@ FROM python:3.9-slim-buster
 
 WORKDIR /app_3
 
-COPY . /app_3
+COPY . .
 
 COPY req.txt req.txt
 
@@ -12,4 +12,4 @@ RUN pip install -r req.txt
 EXPOSE 80 
 
 
-CMD ["python", "app_3.py"]
+CMD ["python", "main.py","AMZN"]
