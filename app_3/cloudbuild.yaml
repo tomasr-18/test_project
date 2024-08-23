@@ -12,12 +12,12 @@ steps:
           '--region', 'europe-west1',
           '--allow-unauthenticated']
   # Add this line to pass the secret as an environment variable
-  env: ['GOOGLE_APPLICATION_CREDENTIALS=$_GOOGLE_APPLICATION_CREDENTIALS'] 
+  #env: ['GOOGLE_APPLICATION_CREDENTIALS=$_GOOGLE_APPLICATION_CREDENTIALS'] 
 
-secrets:
-  - kmsKeyName: "projects/tomastestproject-433206/locations/global/keyRings/secrets-keyring/cryptoKeys/secrets-key"
-    secretEnv:
-      GOOGLE_APPLICATION_CREDENTIALS: hardek00bigquerry # Replace with the actual name of your secret in Secret Manager
+# secrets:
+#   - kmsKeyName: "projects/tomastestproject-433206/locations/global/keyRings/secrets-keyring/cryptoKeys/secrets-key"
+#     secretEnv:
+#       GOOGLE_APPLICATION_CREDENTIALS: hardek00bigquerry # Replace with the actual name of your secret in Secret Manager
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
