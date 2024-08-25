@@ -1,7 +1,7 @@
 
 FROM python:3.9-slim
 
-WORKDIR /fetch_news_app
+WORKDIR /fetch-news-app
 
 COPY . .
 
