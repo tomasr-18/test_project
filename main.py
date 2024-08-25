@@ -29,8 +29,7 @@ def get_news_data(company: str, api_key: str, from_date=(datetime.now() - timede
 
 
 def write(data, company: str, table='table_1', project_id='tomastestproject-433206', dataset='testdb_1') -> None:
-    client = bigquery.Client.from_service_account_json(
-        '/Users/tomasrydenstam/Downloads/tomastestproject-433206-adc5bc090976.json')
+    client = bigquery.Client.from_service_account_json('tomastestproject-433206-adc5bc090976.json')
 
     table_id = f"{project_id}.{dataset}.{table}"
     rows_to_insert = []
