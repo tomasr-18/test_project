@@ -6,6 +6,7 @@ WORKDIR /fetch-news-app
 
 # Kopiera kravfilen och installera beroenden
 COPY req.txt req.txt
+
 RUN pip install -r req.txt
 
 # Kopiera resten av applikationen
