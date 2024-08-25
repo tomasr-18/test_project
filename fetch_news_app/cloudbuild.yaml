@@ -6,7 +6,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news-app/fetch_news_img']
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['run', 'deploy', 'fetch_news_app', 
+  args: ['run', 'deploy', 'fetch-news-app', 
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news-app/fetch_news_img',
           '--platform', 'managed',
           '--region', 'europe-west1',
@@ -22,3 +22,5 @@ steps:
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
+
+  #europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news-app
