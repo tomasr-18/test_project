@@ -4,4 +4,4 @@ python-dotenv
 flask
 pandas
 db-dtypes
-google-cloud-secret-manager
+nltk
