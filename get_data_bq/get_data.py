@@ -2,8 +2,6 @@ import os
 import pandas as pd
 import db_dtypes
 from dotenv import load_dotenv
-
-
 from google.cloud import bigquery
 import os
 import pandas as pd
