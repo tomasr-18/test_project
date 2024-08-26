@@ -1,8 +1,3 @@
-
-
-from google.cloud import bigquery
-from google.cloud import secretmanager
-
 import os
 import pandas as pd
 import db_dtypes
