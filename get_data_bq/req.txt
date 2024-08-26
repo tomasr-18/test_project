@@ -1,0 +1,7 @@
+google-cloud-bigquery
+requests
+python-dotenv
+flask
+pandas
+db-dtypes
+nltk

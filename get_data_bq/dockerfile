@@ -1,0 +1,15 @@
+
+FROM python:3.9-slim-buster
+
+WORKDIR /get_data_bq
+
+COPY . .
+
+COPY req.txt req.txt
+
+RUN pip install -r req.txt
+
+EXPOSE 80
+
+
+CMD ["python", "sentiment.py"]

@@ -1,7 +1,10 @@
+#Använd alltid belgien som region!!!
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3', '-f', 'app/Dockerfile', 'app']
-- name: 'gcr.io/cloud-builders/docker'
+  #Adressen kommer ifrån ditt Artifact Repo. "my-image3" är namnet på imagen.
+  #'app/Dockerfile' anger vart i repot dockerfilen finns. 'app' anger från vilken mapp dockerfilen "läser" ifrån.
+- name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/test3/my-image3']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'my-flask-app',
@@ -10,6 +13,7 @@ steps:
          '--region', 'europe-west1',
          '--allow-unauthenticated']
 
-options:
+options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
+#Kolla upp detta så vi i framtiden sparar loggarna.

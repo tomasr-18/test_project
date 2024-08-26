@@ -1,0 +1,25 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news/asd', '-f', 'news/Dockerfile', 'news']
+  #Adressen kommer ifrån ditt Artifact Repo. "app_3-image" är namnet på imagen. 
+  #'app_3/Dockerfile' anger vart i repot dockerfilen finns. 'app_3' anger från vilken mapp dockerfilen "läser" ifrån.
+- name: 'gcr.io/cloud-builders/docker'        
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news/asd']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['run', 'deploy', 'fetch-news-app', 
+          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-news/asd',
+          '--platform', 'managed',
+          '--region', 'europe-west1',
+          '--allow-unauthenticated']
+  # Add this line to pass the secret as an environment variable
+  #env: ['GOOGLE_APPLICATION_CREDENTIALS=$_GOOGLE_APPLICATION_CREDENTIALS'] 
+
+# secrets:
+#   - kmsKeyName: "projects/tomastestproject-433206/locations/global/keyRings/secrets-keyring/cryptoKeys/secrets-key"
+#     secretEnv:
+#       GOOGLE_APPLICATION_CREDENTIALS: hardek00bigquerry # Replace with the actual name of your secret in Secret Manager
+
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
