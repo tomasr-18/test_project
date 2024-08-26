@@ -25,7 +25,7 @@ def write(data,  table='news_sentiment', project_id='tomastestproject-433206', d
 
     # Initiera BigQuery-klienten
     client = bigquery.Client.from_service_account_json(
-        'get_data_bq/tomastestproject-433206-adc5bc090976.json')
+        'tomastestproject-433206-adc5bc090976.json')
 
     # Definiera din dataset och tabell
     table_id = f"{project_id}.{dataset}.{table}"
@@ -33,7 +33,7 @@ def write(data,  table='news_sentiment', project_id='tomastestproject-433206', d
     list_of_dicts = data.to_dict(orient='records')
     # print(rows_to_insert)
     client.get_table(table_id)
-    errors = client.insert_rows_json(table_id, list_of_dicts)
+    errors = client.insert_rows_json(table_id, list_of_dicts)   
     print(errors)
 
 def make_score(string):
