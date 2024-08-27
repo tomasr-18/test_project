@@ -1,14 +1,7 @@
-
-
-from google.cloud import bigquery
-from google.cloud import secretmanager
-
 import os
 import pandas as pd
 import db_dtypes
 from dotenv import load_dotenv
-
-
 from google.cloud import bigquery
 import os
 import pandas as pd
@@ -16,7 +9,7 @@ import pandas as pd
 
 def fetch_data_by_date(pub_date=None, table='table_1', project_id='tomastestproject-433206', dataset='testdb_1'):
     # Set the path to your service account JSON file
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'get_data_bq/tomastestproject-433206-adc5bc090976.json'
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'tomastestproject-433206-adc5bc090976.json'
 
     table_id = f"{project_id}.{dataset}.{table}"
     # Create a BigQuery client
