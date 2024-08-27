@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 def fetch_news_data_by_date_from_bq(pub_date:str, table='table_1', project_id='tomastestproject-433206', dataset='testdb_1')-> pd.DataFrame:
     # Set the path to your service account JSON file
+
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'tomastestproject-433206-adc5bc090976.json'
 
     table_id = f"{project_id}.{dataset}.{table}"
@@ -42,7 +43,7 @@ def fetch_news_data_by_date_from_bq(pub_date:str, table='table_1', project_id='t
 
 def make_score(string:str)-> float:
     """
-    Predicts sentiment for a string. returns float between -1 and 1.
+    Predicts sentiment for a string. returns a float between -1 and 1.
     """
     nltk.download("vader_lexicon")
     sia = SentimentIntensityAnalyzer()
@@ -70,6 +71,9 @@ def transform_data(df: pd.DataFrame, date: str) -> pd.DataFrame:
 
 
 def write_to_big_query(data:pd.DataFrame, table='news_sentiment', project_id='tomastestproject-433206', dataset='testdb_1'):
+    """
+    Inserts values for: company, score_title, score_description, pub_date and fetch_date to Big Query.
+    """
     client = bigquery.Client.from_service_account_json(
         'tomastestproject-433206-adc5bc090976.json')
     table_id = f"{project_id}.{dataset}.{table}"
@@ -82,7 +86,5 @@ def write_to_big_query(data:pd.DataFrame, table='news_sentiment', project_id='to
 
 #Exempel på användning av funktionen
 if __name__ == "__main__":
-    fetch_data_by_date("2024-08-20")
-    # secret = access_secret_version(
-    #     name='projects/839243415895/secrets/test-github-oauthtoken-e3deeb')
-    # print(f"Fetched secret: {secret}")
+    #fetch_data_by_date("2024-08-20")
+    pass
