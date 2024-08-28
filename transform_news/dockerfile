@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Ställ in arbetskatalogen i containern
-WORKDIR /get_data_bq
+WORKDIR /transform_news
 
 # Kopiera requirements.txt till arbetskatalogen
 COPY req.txt .
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8000
 
 # Starta Flask-applikationen
-CMD ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
