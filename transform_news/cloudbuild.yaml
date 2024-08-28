@@ -10,8 +10,7 @@ steps:
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img',
           '--platform', 'managed',
           '--region', 'europe-west1',
-          '--allow-unauthenticated',
-          '--set-env-vars', 'PORT=8000'  # Ändra miljövariabeln PORT till 8000
+          '--allow-unauthenticated'
           ]
 
 options:  
