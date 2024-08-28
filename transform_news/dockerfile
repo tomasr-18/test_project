@@ -1,0 +1,20 @@
+# Använd en officiell Python-bild som bas
+FROM python:3.9-slim
+
+# Ställ in arbetskatalogen i containern
+WORKDIR /get_data_bq
+
+# Kopiera requirements.txt till arbetskatalogen
+COPY req.txt .
+
+# Installera Python-biblioteken som behövs
+RUN pip install --no-cache-dir -r req.txt
+
+# Kopiera all kod till containern
+COPY . .
+
+# Exponera port 8000 (samma som i din Flask-app)
+EXPOSE 8000
+
+# Starta Flask-applikationen
+CMD ["python", "main.py"]

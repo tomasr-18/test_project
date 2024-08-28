@@ -1,71 +1,53 @@
-from flask import Flask, request, jsonify
-import requests
-from google.cloud import bigquery
+# main.py
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
+import uvicorn
 import os
+from fetch_raw_data import fetch_news,save_raw_data_to_big_query  
+from dotenv import load_dotenv
 
-app = Flask(__name__)
-
-# Ladda miljövariabler från .env-filen
 load_dotenv()
-
-# Definiera funktion för att hämta nyhetsdata
-
-
-def get_news_data(company: str, api_key: str, from_date=(datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d'), to_date=datetime.now().strftime('%Y-%m-%d'), sort_by='relevance', language='en'):
-    url = f'https://newsapi.org/v2/everything?q={company}&from={from_date}&to={to_date}&sortBy={sort_by}&language={language}&apiKey={api_key}'
-    response = requests.get(url=url)
-
-    # print('from:', from_date)
-    # print('to: ', to_date)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print('Misslyckad request till newsapi', response.status_code)
-        return None
-
-# Definiera funktion för att skriva data till BigQuery
+app = FastAPI()
 
 
-def write(data, company: str, table='table_1', project_id='tomastestproject-433206', dataset='testdb_1') -> None:
-    client = bigquery.Client.from_service_account_json('tomastestproject-433206-adc5bc090976.json')
-
-    table_id = f"{project_id}.{dataset}.{table}"
-    rows_to_insert = []
-
-    for row in data['articles']:
-        row['source'] = row['source']['name']
-        row['company'] = company
-        row['fetch_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        rows_to_insert.append(row)
-
-    errors = client.insert_rows_json(table_id, rows_to_insert)
-    if errors:
-        print(errors)
-    else:
-        print("Inga fel vid insättning av rader.")
-
-# Definiera API-endpoint för att hämta nyheter och skriva till BigQuery
+class QueryParameters(BaseModel):
+    company: str
+    from_date: Optional[str] = (
+        datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+    to_date: Optional[str] = datetime.now().strftime('%Y-%m-%d')
 
 
-@app.route('/fetch_news', methods=['POST'])
-def fetch_news():
-    company = request.json.get('company')
+@app.post("/fetch-news/")
+def fetch_news_and_save(params: QueryParameters):
+      # Ersätt med din NewsAPI-nyckel
 
-    if not company:
-        return jsonify({"error": "Företagsnamn saknas"}), 400
+    try:
+        # 1. Hämta nyheter från API:t
+        news_data = fetch_news(
+            company=params.company,
+            from_date=params.from_date,
+            to_date=params.to_date,
+            api_key=os.getenv('NEWS_API_KEY')
+        )
 
-    data = get_news_data(api_key=os.getenv('NEWS_API_KEY'), company=company)
+        if not news_data or 'articles' not in news_data or len(news_data['articles']) == 0:
+            raise HTTPException(status_code=404, detail="No data found.")
 
-    if data:
-        write(data=data, company=company)
-        return jsonify({"message": "Data inskriven i BigQuery"}), 200
-    else:
-        return jsonify({"error": "Misslyckades att hämta nyhetsdata"}), 500
+        # 2. Spara data till BigQuery
+        save_raw_data_to_big_query(data=news_data, company=params.company)
+
+        # 3. Returnera framgångsmeddelande med hämtade data
+        return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults']}
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-if __name__ == '__main__':
-   
-    app.run(host='0.0.0.0', port=8080)
-    
+# Kör servern med uvicorn om du kör den lokalt
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
