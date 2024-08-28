@@ -6,10 +6,6 @@ from datetime import datetime, timedelta
 import json
 from google.cloud import secretmanager
 
-
-
-
-
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
 
