@@ -1,13 +1,13 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news', '-f', 'fetch_news/dockerfile', 'fetch_news']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/sentiment-analysis/img-4', '-f', 'get_data_bq/dockerfile', 'get_data_bq']
   #Adressen kommer ifrån ditt Artifact Repo. "app_3-image" är namnet på imagen. 
   #'app_3/Dockerfile' anger vart i repot dockerfilen finns. 'app_3' anger från vilken mapp dockerfilen "läser" ifrån.
 - name: 'gcr.io/cloud-builders/docker'        
-  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news']
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/sentiment-analysis/img-4']
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['run', 'deploy', 'fetch-raw-news-app', 
-          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news',
+  args: ['run', 'deploy', 'get-data-bq', 
+          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/sentiment-analysis/img-4',
           '--platform', 'managed',
           '--region', 'europe-west1',
           '--allow-unauthenticated']
