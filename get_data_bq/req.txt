@@ -1,7 +1,8 @@
 google-cloud-bigquery
 requests
 python-dotenv
-flask
+fastapi
 pandas
 db-dtypes
 nltk
+pydantic

@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
-import uvicorn
+#import uvicorn
 import os
 from fetch_raw_data import fetch_news,save_raw_data_to_big_query  
 from dotenv import load_dotenv
