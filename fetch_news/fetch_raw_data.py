@@ -7,6 +7,9 @@ import json
 from google.cloud import secretmanager
 
 
+
+
+
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
 
@@ -95,8 +98,17 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     """
     try:
         # Initiera BigQuery-klienten
+
+        # Hämta JSON-sträng från Secret Manager
         secret_data = get_secret(secret)
-        client = bigquery.Client.from_service_account_json(secret_data)
+
+        # Ladda JSON-strängen till en dictionary
+        service_account_info = json.loads(secret_data)
+
+        # Initiera BigQuery-klienten med service account
+        client = bigquery.Client.from_service_account_info(
+            service_account_info)
+    
 
         # .from_service_account_json(
         #     'news/tomastestproject-433206-adc5bc090976.json')
