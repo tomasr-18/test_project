@@ -13,8 +13,7 @@ RUN pip install --no-cache-dir -r req.txt
 # Kopiera all kod till containern
 COPY . .
 
-# Exponera port 8000 (samma som i din Flask-app)
+
 EXPOSE 8080
 
-# Starta Flask-applikationen
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
