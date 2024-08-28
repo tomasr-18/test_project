@@ -70,8 +70,10 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     """
     try:
         # Initiera BigQuery-klienten
-        client = bigquery.Client.from_service_account_json(
-            'news/tomastestproject-433206-adc5bc090976.json')
+        client = bigquery.Client()
+
+        # .from_service_account_json(
+        #     'news/tomastestproject-433206-adc5bc090976.json')
 
         # Lägg till dagens datum i data-dict
         fetch_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
