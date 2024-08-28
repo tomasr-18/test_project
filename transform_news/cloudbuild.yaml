@@ -1,8 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img', '-f', 'transform_news/dockerfile', 'transform_news']
-  # Adressen kommer ifrån ditt Artifact Repo. "clean-news-img" är namnet på imagen. 
-  # 'transform_news/Dockerfile' anger vart i repot dockerfilen finns. 'transform_news' anger från vilken mapp dockerfilen "läser" ifrån.
 - name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img']
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -10,12 +8,11 @@ steps:
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img',
           '--platform', 'managed',
           '--region', 'europe-west1',
-          '--allow-unauthenticated',
-          '--set-env-vars', 'PORT=8000'  # Sätt porten här eller vilken port du vill använda
+          '--allow-unauthenticated'
           ]
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
 
-serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Replace with your actual Cloud Build service account
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
