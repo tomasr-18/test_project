@@ -10,8 +10,7 @@ steps:
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img',
           '--platform', 'managed',
           '--region', 'europe-west1',
-          '--allow-unauthenticated',
-          '--port','8000']
+          '--allow-unauthenticated']
   # Add this line to pass the secret as an environment variable
   #env: ['GOOGLE_APPLICATION_CREDENTIALS=$_GOOGLE_APPLICATION_CREDENTIALS'] 
 
@@ -21,6 +20,6 @@ steps:
 #       GOOGLE_APPLICATION_CREDENTIALS: hardek00bigquerry # Replace with the actual name of your secret in Secret Manager
 
 options:  
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKETs
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
 
