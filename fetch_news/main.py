@@ -48,6 +48,6 @@ def fetch_news_and_save(params: QueryParameters):
 
 # Kör servern med uvicorn om du kör den lokalt
 if __name__ == "__main__":
-    # import uvicorn
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
-    pass
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+    

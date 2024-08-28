@@ -7,13 +7,13 @@ import json
 from google.cloud import secretmanager
 
 
-def get_secret(secret_name:str):
+def get_secret(secret_name: str) -> str:
     client = secretmanager.SecretManagerServiceClient()
     project_id = 'tomastestproject-433206'
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
     response = client.access_secret_version(name=secret_path)
     secret_data = response.payload.data.decode('UTF-8')
-    return json.loads(secret_data)
+    return secret_data
 
 def fetch_news(company: str, api_key: str,
              from_date: str = (
@@ -120,3 +120,7 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
+
+if __name__ == "__main__":
+    print(get_secret('bigquery-accout-secret'))
