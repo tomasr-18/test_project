@@ -20,7 +20,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     client = secretmanager.SecretManagerServiceClient()
 
     # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = 'your-project-id'  # Ersätt med ditt projekt-ID
+    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
     # Hämta den senaste versionen av hemligheten
