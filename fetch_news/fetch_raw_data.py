@@ -4,7 +4,16 @@ import requests
 from google.cloud import bigquery
 from datetime import datetime, timedelta
 import json
+from google.cloud import secretmanager
 
+
+def get_secret(secret_name:str):
+    client = secretmanager.SecretManagerServiceClient()
+    project_id = 'tomastestproject-433206'
+    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+    response = client.access_secret_version(name=secret_path)
+    secret_data = response.payload.data.decode('UTF-8')
+    return json.loads(secret_data)
 
 def fetch_news(company: str, api_key: str,
              from_date: str = (
@@ -53,7 +62,7 @@ def fetch_news(company: str, api_key: str,
         raise
 
 
-def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1'):
+def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
 
@@ -70,7 +79,8 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     """
     try:
         # Initiera BigQuery-klienten
-        client = bigquery.Client().from_service_account_json('tomastestproject-433206-adc5bc090976.json')
+        secret_data = get_secret(secret)
+        client = bigquery.Client().from_service_account_json(secret_data)
 
         # .from_service_account_json(
         #     'news/tomastestproject-433206-adc5bc090976.json')
