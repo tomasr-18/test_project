@@ -1,19 +1,20 @@
-# Använd en Python-bild
+# Använd en officiell Python-bild som bas
 FROM python:3.9-slim
 
-# Sätt arbetskatalogen i containern
-WORKDIR /fetch-news-app
+# Ställ in arbetskatalogen i containern
+WORKDIR /fetch_news
 
-# Kopiera kravfilen och installera beroenden
-COPY req.txt req.txt
+# Kopiera requirements.txt till arbetskatalogen
+COPY req.txt .
 
-RUN pip install -r req.txt
+# Installera Python-biblioteken som behövs
+RUN pip install --no-cache-dir -r req.txt
 
-# Kopiera resten av applikationen
+# Kopiera all kod till containern
 COPY . .
 
-# Exponera porten som Flask använder
-EXPOSE 5000
+# Exponera port 8000 (samma som i din Flask-app)
+EXPOSE 8080
 
 # Starta Flask-applikationen
-CMD ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

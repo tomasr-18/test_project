@@ -4,3 +4,4 @@ pandas
 db-dtypes
 nltk
 pydantic
+uvicorn

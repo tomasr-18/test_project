@@ -4,7 +4,31 @@ import requests
 from google.cloud import bigquery
 from datetime import datetime, timedelta
 import json
+from google.cloud import secretmanager
 
+def get_secret(secret_name='bigquery-accout-secret') -> str:
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
+    response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
+    secret_data = response.payload.data.decode('UTF-8')
+
+    return secret_data
 
 def fetch_news(company: str, api_key: str,
              from_date: str = (
@@ -53,7 +77,7 @@ def fetch_news(company: str, api_key: str,
         raise
 
 
-def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1'):
+def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
 
@@ -70,8 +94,20 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     """
     try:
         # Initiera BigQuery-klienten
-        client = bigquery.Client.from_service_account_json(
-            'news/tomastestproject-433206-adc5bc090976.json')
+
+        # Hämta JSON-sträng från Secret Manager
+        secret_data = get_secret(secret)
+
+        # Ladda JSON-strängen till en dictionary
+        service_account_info = json.loads(secret_data)
+
+        # Initiera BigQuery-klienten med service account
+        client = bigquery.Client.from_service_account_info(
+            service_account_info)
+    
+
+        # .from_service_account_json(
+        #     'news/tomastestproject-433206-adc5bc090976.json')
 
         # Lägg till dagens datum i data-dict
         fetch_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -108,3 +144,6 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
+if __name__=='__main__':
+    print(get_secret())

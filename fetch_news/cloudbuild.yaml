@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img', '-f', 'fetch_news/dockerfile', 'fetch_news']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img', '-f', 'fetch_news/Dockerfile', 'fetch_news']
   #Adressen kommer ifrån ditt Artifact Repo. "app_3-image" är namnet på imagen. 
   #'app_3/Dockerfile' anger vart i repot dockerfilen finns. 'app_3' anger från vilken mapp dockerfilen "läser" ifrån.
 - name: 'gcr.io/cloud-builders/docker'        
@@ -22,4 +22,6 @@ steps:
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Replace with your actual Cloud Build service account
 
