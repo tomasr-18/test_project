@@ -2,7 +2,32 @@ import pandas as pd
 from google.cloud import bigquery
 import os
 from nltk.sentiment import SentimentIntensityAnalyzer
+from google.cloud import secretmanager
+import json
 
+def get_secret(secret_name='bigquery-accout-secret') -> str:
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
+    response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
+    secret_data = response.payload.data.decode('UTF-8')
+
+    return secret_data
 
 def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1') -> pd.DataFrame:
     """ 
@@ -12,12 +37,18 @@ def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-4
     from the specified table within the given dataset and project, and returns the results as a pandas DataFrame.
     """
 
+    secret_data = get_secret()
 
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'tomastestproject-433206-adc5bc090976.json'
+    # Ladda JSON-strängen till en dictionary
+    service_account_info = json.loads(secret_data)
+
+    # Initiera BigQuery-klienten med service account
+    client = bigquery.Client.from_service_account_info(
+        service_account_info)
 
     table_id = f"{project_id}.{dataset}.{table}"
     # Create a BigQuery client
-    client = bigquery.Client()
+    
 
     # Build your SQL query
     query = f"""
@@ -103,9 +134,14 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news', project_id='t
     Writes cleaned data to Big Query
     """
     # Initiera BigQuery-klienten
-    client = bigquery.Client.from_service_account_json(
-        '/Users/tomasrydenstam/Desktop/Skola/test_project/transform_news/tomastestproject-433206-adc5bc090976.json'
-    )
+    secret_data = get_secret()
+
+    # Ladda JSON-strängen till en dictionary
+    service_account_info = json.loads(secret_data)
+
+    # Initiera BigQuery-klienten med service account
+    client = bigquery.Client.from_service_account_info(
+        service_account_info)
 
     # Definiera fullständigt tabell-id
     table_id = f"{project_id}.{dataset}.{table}"
