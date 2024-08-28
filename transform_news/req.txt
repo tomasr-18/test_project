@@ -1,0 +1,7 @@
+google-cloud-bigquery
+fastapi
+pandas
+db-dtypes
+nltk
+pydantic
+uvicorn
