@@ -25,7 +25,7 @@ class NewsRequest(BaseModel):
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
 
 
-@app.post("/clean_news")
+@app.post("/clean_news/")
 def clean_news_endpoint(request: NewsRequest):
     try:
         # Hämta data från BigQuery
