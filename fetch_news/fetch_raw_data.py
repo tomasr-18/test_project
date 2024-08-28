@@ -7,12 +7,28 @@ import json
 from google.cloud import secretmanager
 
 
-def get_secret(secret_name: str) -> str:
+def get_secret(secret_name='bigquery-accout-secret') -> str:
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
     client = secretmanager.SecretManagerServiceClient()
-    project_id = 'tomastestproject-433206'
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = 'your-project-id'  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
     response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
     secret_data = response.payload.data.decode('UTF-8')
+
     return secret_data
 
 def fetch_news(company: str, api_key: str,
@@ -121,6 +137,5 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         print(f"An unexpected error occurred: {e}")
         raise
 
-
-if __name__ == "__main__":
-    print(get_secret('bigquery-accout-secret'))
+if __name__=='__main__':
+    print(get_secret())
