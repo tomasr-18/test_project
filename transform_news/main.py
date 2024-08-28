@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
+import os
+import uvicorn
 from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq
 
 # Ladda dina funktioner (se till att de finns i samma fil eller att de importeras korrekt)
@@ -48,7 +50,7 @@ def clean_news_endpoint(request: NewsRequest):
 
 
 # Kör appen om detta script är huvudscripten
+
 if __name__ == "__main__":
-    # import uvicorn
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
+    #uvicorn.run(app, host="0.0.0.0", port=8000)
     pass
