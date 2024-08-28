@@ -70,7 +70,7 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
     """
     try:
         # Initiera BigQuery-klienten
-        client = bigquery.Client()
+        client = bigquery.Client().from_service_account_json('tomastestproject-433206-adc5bc090976.json')
 
         # .from_service_account_json(
         #     'news/tomastestproject-433206-adc5bc090976.json')
