@@ -6,7 +6,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img']
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['run', 'deploy', 'get-data-bq', 
+  args: ['run', 'deploy', 'clean-news', 
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news/clean-news-img',
           '--platform', 'managed',
           '--region', 'europe-west1',
