@@ -1,0 +1,19 @@
+main:
+  steps:
+    - call_service:
+        call: http.post
+        args:
+          url: ${"https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"}
+          body:
+            company: ${"TSLA"}
+          headers:
+            Content-Type: ${"application/json"}
+        result: service_response
+
+    - log_response:
+        call: sys.log
+        args:
+          text: '${format("Response from service for company TSLA: %s", json.dumps(service_response))}'
+
+    - return_result:
+        return: '${"Processing completed. Response: " + json.dumps(service_response)}'
