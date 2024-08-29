@@ -16,6 +16,7 @@ class QueryParameters(BaseModel):
     from_date: Optional[str] = (
         datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     to_date: Optional[str] = datetime.now().strftime('%Y-%m-%d')
+    table_name: Optional[str] = 'raw_news'
 
 
 @app.post("/fetch-news/")
@@ -35,7 +36,7 @@ def fetch_news_and_save(params: QueryParameters):
             raise HTTPException(status_code=404, detail="No data found.")
 
         # 2. Spara data till BigQuery
-        save_raw_data_to_big_query(data=news_data, company=params.company)
+        save_raw_data_to_big_query(data=news_data, company=params.company,table=params.table_name)
 
         # 3. Returnera framgångsmeddelande med hämtade data
         return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults']}
