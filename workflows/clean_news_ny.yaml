@@ -5,7 +5,7 @@ main:
     - call_service:
         call: http.post
         args:
-          url: "https://clean-news-app-b3o5cypbia-ew.a.run.app/clean_news/"
+          url: "https://clean-news-app-ny-b3o5cypbia-ew.a.run.app/clean_news/"
           auth:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
