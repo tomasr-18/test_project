@@ -4,7 +4,8 @@ import nltk
 import os
 import uvicorn
 from typing import Optional
-from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed
+from google.cloud import bigquery
+from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentiment, write_clean_news_to_bq, update_is_processed
 
 
 
@@ -35,7 +36,7 @@ def clean_news_endpoint(request: NewsRequest):
             table=request.fetch_table, project_id=request.project_id, dataset=request.dataset)
             
         # Rensa nyhetsdata
-        cleaned_df = clean_news(df=df)
+        cleaned_df = clean_news_3(df=df)
 
         # Gör sentimentanalyser
         predict_sentiment(df=cleaned_df)
@@ -56,5 +57,5 @@ def clean_news_endpoint(request: NewsRequest):
 # Kör appen om detta script är huvudscripten
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-    #pass
+    #uvicorn.run(app, host="0.0.0.0", port=8000)
+    pass

@@ -116,6 +116,54 @@ def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='
     print(f'raderna {id_string} har ändrats')
 
 
+def clean_news_3(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
+
+    This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
+    for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
+    one row per article with relevant information such as author, description, publication date, title, URL, 
+    source, company, and sentiment scores.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing raw news data with columns `unique_id`, `company`, `fetch_date`, `data`, and `is_processed`.
+
+    Returns:
+        pd.DataFrame: A DataFrame where each row represents a single news article with additional columns from the `company` column.
+    """
+    def extract_articles(json_obj):
+        if isinstance(json_obj, dict) and 'articles' in json_obj:
+            return json_obj['articles']
+        return []
+
+    # Förbered DataFrame
+    df['data'] = df['data'].apply(
+        lambda x: json.loads(x) if isinstance(x, str) else {})
+    df['data'] = df['data'].apply(extract_articles)
+
+    # Explodera artiklar till separata rader
+    df_exploded = df.explode('data')
+
+    # Normalisera JSON-data i 'data' kolumnen
+    articles_df = pd.json_normalize(df_exploded['data'])
+
+    # Lägg till övriga kolumner
+    final_df = pd.concat(
+        [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
+
+    # Droppa eventuellt onödiga kolumner
+    final_df.drop(columns=['content', 'source.id',
+                  'urlToImage'], inplace=True, errors='ignore')
+
+    # Omvandla 'publishedAt' till datetime format
+    final_df['publishedAt'] = pd.to_datetime(
+        final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True, errors='coerce')
+
+    # Omvandla kolumnnamn för läsbarhet
+    final_df.rename(columns={"source.name": "source_name",
+                    "publishedAt": "pub_date"}, inplace=True)
+
+    return final_df
 
 def clean_news(df: pd.DataFrame) -> pd.DataFrame:
     """
