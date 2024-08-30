@@ -7,8 +7,6 @@
 4.  Skapa en service under Cloud Run med den imagen som skapats i Cloud Run. imagen ska ligga i det Artifact Repo du precis skapade.
 
 
-
-
 Kod som är deployad i GCP:
 -fetch_news
 -transform_news

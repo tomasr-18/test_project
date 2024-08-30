@@ -1,7 +1,7 @@
 gcloud scheduler jobs create http fetch-news-job \
   --schedule "0 23 * * *" \
   --http-method POST \
-  --uri "https://workflowexecutions.googleapis.com/v1/projects/YOUR_PROJECT_ID/locations/YOUR_REGION/workflows/YOUR_WORKFLOW_NAME/executions" \
+  --uri "https://workflowexecutions.googleapis.com/v1/projects/tomastestproject-433206/locations/europe-west1/workflows/YOUR_WORKFLOW_NAME/executions" \
   --oauth-service-account-email YOUR_SERVICE_ACCOUNT_EMAIL \
   --time-zone "UTC"
 
