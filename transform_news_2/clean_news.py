@@ -30,7 +30,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1'):
+def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.
@@ -50,7 +50,7 @@ def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-4
         str: A string of `unique_id`s from the fetched rows, formatted as comma-separated values in single quotes.
 
     Raises:
-        ValueError: If no unprocessed data is found in the table.
+        ValueError: If no unprocessed data is found in the table.xw
     """
     secret_data = get_secret()
 
@@ -85,13 +85,13 @@ def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-4
     # Create a comma-separated string of unique IDs
     processed_id_list = df["unique_id"].to_list()
     id_str = ', '.join(f"'{id}'" for id in processed_id_list)
+    print(id_str)
 
     return df, id_str
 
 
+def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
 
-def update_is_processed(id_string: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1'):
-    
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
 
@@ -113,6 +113,7 @@ def update_is_processed(id_string: str, table='raw_news', project_id='tomastestp
     # Kör frågan
     job = client.query(query)
     job.result()  # Vänta på att jobbet ska slutföras
+    print(f'raderna {id_string} har ändrats')
 
 
 
@@ -129,6 +130,7 @@ def clean_news(df: pd.DataFrame) -> pd.DataFrame:
     # Förbered DataFrame
     # Se till att 'data' kolumnen är en lista av artiklar
     df.drop(columns=['unique_id'], inplace=True)
+
     df['data'] = df['data'].apply(lambda x: x.get(
         'articles', []) if isinstance(x, dict) else [])
 
@@ -174,7 +176,7 @@ def predict_sentiment(df: pd.DataFrame):
     df['score_title'] = df['title'].apply(make_sentiment_score)
 
 
-def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news', project_id='tomastestproject-433206', dataset='testdb_1'):
+def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_id='tomastestproject-433206', dataset='testdb_1'):
     """
     Writes cleaned data to Big Query
     """
