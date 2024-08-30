@@ -88,16 +88,6 @@ def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastes
     processed_id_list = df["unique_id"].to_list()
     id_str = ', '.join(f"'{id}'" for id in processed_id_list)
 
-    query = f"""
-    UPDATE `{table_id}`
-    SET is_processed = TRUE
-    WHERE unique_id IN ({id_str});
-    """
-
-    # Kör frågan
-    job = client.query(query)
-    job.result()  # Vänta på att jobbet ska slutföras
-
     return df, id_str
 
 
