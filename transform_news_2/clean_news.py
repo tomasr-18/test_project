@@ -30,7 +30,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1') -> (pd.DataFrame, str):
+def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1'):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.

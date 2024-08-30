@@ -32,10 +32,10 @@ def clean_news_endpoint(request: NewsRequest):
     try:
         # Hämta data från BigQuery
         df,ids = get_raw_news_from_big_query(
-            request.fetch_table, request.project_id, request.dataset)
+            table=request.fetch_table, project_id=request.project_id, dataset=request.dataset)
             
         # Rensa nyhetsdata
-        cleaned_df = clean_news(df)
+        cleaned_df = clean_news(df=df)
 
         # Gör sentimentanalyser
         predict_sentiment(df=cleaned_df)
