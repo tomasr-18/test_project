@@ -6,7 +6,7 @@ import uvicorn
 from typing import Optional
 from google.cloud import bigquery
 from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentiment, write_clean_news_to_bq, update_is_processed
-
+import logging
 
 
 
@@ -54,8 +54,10 @@ def clean_news_endpoint(request: NewsRequest):
         return {"message": "Data cleaned and written to BigQuery successfully.", "rows_written": rows_written}
 
     except Exception as e:
-        # Hantera undantag och returnera felmeddelanden
-        raise HTTPException(status_code=500, detail=str(e))
+            # Logga detaljer om felet och returnera ett HTTP-fel med detaljer
+            logging.error(f"Error occurred: {e}")
+            raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
+
 
 
 # Kör appen om detta script är huvudscripten
