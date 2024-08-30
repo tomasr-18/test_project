@@ -5,7 +5,7 @@ import os
 import uvicorn
 from typing import Optional
 from google.cloud import bigquery
-from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentiment, write_clean_news_to_bq, update_is_processed_2
+from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentiment, write_clean_news_to_bq, update_is_processed
 import logging
 
 
@@ -48,7 +48,7 @@ def clean_news_endpoint(request: NewsRequest):
         # Skriv de rensade nyheterna till BigQuery och få antalet rader som skrevs
         rows_written = write_clean_news_to_bq(data=cleaned_df,table=request.write_table)
 
-        update_is_processed_2(id_string=ids, table=request.fetch_table)
+        #update_is_processed(id_string=ids, table=request.fetch_table)
 
         # Returnera resultat som JSON
         return {"message": "Data cleaned and written to BigQuery successfully.", "rows_written": rows_written}

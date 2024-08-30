@@ -87,12 +87,22 @@ def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastes
     # Create a comma-separated string of unique IDs
     processed_id_list = df["unique_id"].to_list()
     id_str = ', '.join(f"'{id}'" for id in processed_id_list)
-    print(id_str)
+
+    query = f"""
+    UPDATE `{table_id}`
+    SET is_processed = TRUE
+    WHERE unique_id IN ({id_str});
+    """
+
+    # Kör frågan
+    job = client.query(query)
+    job.result()  # Vänta på att jobbet ska slutföras
 
     return df, id_str
 
 
-def update_is_processed_2(id_string: str, table='raw_news_data', project_id='tomastestproject-433206', dataset='testdb_1'):
+def update_is_processed_2(id_string: str, table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
+
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
 
@@ -100,31 +110,22 @@ def update_is_processed_2(id_string: str, table='raw_news_data', project_id='tom
     service_account_info = json.loads(secret_data)
 
     # Initiera BigQuery-klienten med service account
-    client = bigquery.Client.from_service_account_info(service_account_info)
+    client = bigquery.Client.from_service_account_info(
+        service_account_info)
 
-    # Försök uppdatera med återförsök
-    for attempt in range(5):
-        try:
-            # Konstruera SQL-frågan
-            query = f"""
-            UPDATE `{table_id}`
-            SET is_processed = TRUE
-            WHERE unique_id IN ({id_string});
-            """
+    # Konstruera SQL-frågan
+    query = f"""
+    UPDATE `{table_id}`
+    SET is_processed = TRUE
+    WHERE unique_id IN ({id_string});
+    """
 
-            # Kör frågan
-            job = client.query(query)
-            job.result()  # Vänta på att jobbet ska slutföras
-            print(f'raderna {id_string} har ändrats')
-            break  # Lyckades, bryt ut från loopen
+    # Kör frågan
+    job = client.query(query)
+    job.result()  # Vänta på att jobbet ska slutföras
 
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            if "streaming buffer" in str(e):
-                print("Waiting for data to leave the streaming buffer...")
-                time.sleep(60)  # Vänta en minut och försök igen
-            else:
-                raise  # Om det är ett annat fel, kasta det vidare
+    
+    
 
 def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
 
