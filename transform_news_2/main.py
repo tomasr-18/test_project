@@ -36,8 +36,8 @@ def clean_news_endpoint(request: NewsRequest):
         df,ids = get_raw_news_from_big_query(
             table=request.fetch_table, project_id=request.project_id, dataset=request.dataset)
         
-        if df is None:
-            return {"message": "There is no unprocessed date"}
+        if df is None or ids is None or df.empty:
+            return {"message": "There is no unprocessed data to fetch."}
             
         # Rensa nyhetsdata
         cleaned_df = clean_news_3(df=df)
