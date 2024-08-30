@@ -11,8 +11,8 @@ main:
           body:
             project_id: "tomastestproject-433206"
             dataset: "testdb_1"
-            fetch_table: "raw_news_with_uuid"
-            write_table: "clean_news_copy"
+            fetch_table: "raw_news_data"
+            write_table: "clean_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response

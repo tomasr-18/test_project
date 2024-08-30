@@ -8,7 +8,7 @@ main:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
             company: "AAPL"
-            table_name: "raw_news_copy"
+            table_name: "raw_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response_AAPL
@@ -21,7 +21,7 @@ main:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
             company: "GOOGL"
-            table_name: "raw_news_copy"
+            table_name: "raw_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response_GOOGL
@@ -34,7 +34,7 @@ main:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
             company: "MSFT"
-            table_name: "raw_news_copy"
+            table_name: "raw_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response_MSFT
@@ -47,7 +47,7 @@ main:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
             company: "AMZN"
-            table_name: "raw_news_copy"
+            table_name: "raw_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response_AMZN
@@ -60,7 +60,7 @@ main:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
             company: "TSLA"
-            table_name: "raw_news_copy"
+            table_name: "raw_news_data"
           headers:
             Content-Type: "application/json"
         result: service_response_TSLA

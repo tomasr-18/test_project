@@ -107,9 +107,6 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
             service_account_info)
     
 
-        # .from_service_account_json(
-        #     'news/tomastestproject-433206-adc5bc090976.json')
-
         # Lägg till dagens datum i data-dict
         fetch_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -149,4 +146,5 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         raise
 
 if __name__=='__main__':
-    print(get_secret())
+    #print(get_secret())
+    pass
