@@ -5,6 +5,7 @@ from google.cloud import bigquery
 from datetime import datetime, timedelta
 import json
 from google.cloud import secretmanager
+import uuid
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -116,7 +117,9 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         rows_to_insert = [{
             "data": json.dumps(data),  # JSON-sträng för din data
             "fetch_date": fetch_date,  # Datum som en separat kolumn
-            "company": company
+            "company": company,
+            "is_processed": False,
+            "unique_id": str(uuid.uuid4())
         }]
 
         # Definiera din dataset och tabell
