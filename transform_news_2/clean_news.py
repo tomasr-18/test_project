@@ -64,7 +64,7 @@ def get_raw_news_from_big_query(table='raw_news', project_id='tomastestproject-4
 
     # Build your SQL query
     query = f"""
-        SELECT unique_id, data
+        SELECT unique_id, data,company
         FROM `{table_id}`
         WHERE is_processed IS FALSE
         """
@@ -101,6 +101,7 @@ def update_is_processed(id_string: str, table='raw_news', project_id='tomastestp
     # Initiera BigQuery-klienten med service account
     client = bigquery.Client.from_service_account_info(
         service_account_info)
+   
 
         # Konstruera SQL-frågan
     query = f"""
@@ -127,6 +128,7 @@ def clean_news(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Förbered DataFrame
     # Se till att 'data' kolumnen är en lista av artiklar
+    df.drop(columns=['unique_id'], inplace=True)
     df['data'] = df['data'].apply(lambda x: x.get(
         'articles', []) if isinstance(x, dict) else [])
 
@@ -176,7 +178,7 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news', project_id='t
     """
     Writes cleaned data to Big Query
     """
-    # Initiera BigQuery-klienten
+    #Initiera BigQuery-klienten
     secret_data = get_secret()
 
     # Ladda JSON-strängen till en dictionary
@@ -185,6 +187,7 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news', project_id='t
     # Initiera BigQuery-klienten med service account
     client = bigquery.Client.from_service_account_info(
         service_account_info)
+
 
     # Definiera fullständigt tabell-id
     table_id = f"{project_id}.{dataset}.{table}"
