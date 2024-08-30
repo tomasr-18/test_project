@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news-ny/clean-news-img-ny', '-f', 'transform_news/dockerfile', 'transform_news']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news-ny/clean-news-img-ny', '-f', 'transform_news_2/dockerfile', 'transform_news_2']
 - name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news-ny/clean-news-img-ny']
 - name: 'gcr.io/cloud-builders/gcloud'
