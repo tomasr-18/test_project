@@ -9,6 +9,7 @@ from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentim
 
 
 
+
 # Säkerställ att NLTK-data laddas
 nltk.download('vader_lexicon')
 
@@ -34,6 +35,9 @@ def clean_news_endpoint(request: NewsRequest):
         # Hämta data från BigQuery
         df,ids = get_raw_news_from_big_query(
             table=request.fetch_table, project_id=request.project_id, dataset=request.dataset)
+        
+        if df is None:
+            return {"message": "There is no unprocessed date"}
             
         # Rensa nyhetsdata
         cleaned_df = clean_news_3(df=df)
