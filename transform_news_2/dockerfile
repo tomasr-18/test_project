@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Ställ in arbetskatalogen i containern
-WORKDIR /transform_news
+WORKDIR /transform_news_ny
 
 # Kopiera requirements.txt till arbetskatalogen
 COPY req.txt .
