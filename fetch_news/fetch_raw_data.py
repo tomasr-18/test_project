@@ -146,45 +146,6 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         raise
 
 
-def transfer_ids_to_meta_data(table_from='raw_news_data',table_to='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
-    try:
-        # Initiera BigQuery-klienten
-
-        # Hämta JSON-sträng från Secret Manager
-        secret_data = get_secret(secret)
-
-        # Ladda JSON-strängen till en dictionary
-        service_account_info = json.loads(secret_data)
-
-        # Initiera BigQuery-klienten med service account
-        client = bigquery.Client.from_service_account_info(
-            service_account_info)
-
-        # Definiera din dataset och tabell
-        meta_data_table = f"{project_id}.{dataset}.{table_to}"
-        raw_data_table = f"{project_id}.{dataset}.{table_from}"
-        query=f"""
-                    INSERT INTO `{meta_data_table}` (unique_id, is_processed)
-                    SELECT unique_id, FALSE
-                    FROM `{raw_data_table}`
-                    WHERE unique_id NOT IN (
-                    SELECT unique_id 
-                    FROM `{meta_data_table}`)
-                """
-        # Infoga data till BigQuery
-        errors = client.query(query)
-
-    except NotFound:
-        print(f"Error: The table {meta_data_table} was not found.")
-        raise
-
-    except GoogleAPIError as e:
-        print(f"Google API Error: {e}")
-        raise
-
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        raise
 if __name__=='__main__':
     #print(get_secret())
     pass

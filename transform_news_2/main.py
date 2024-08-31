@@ -5,7 +5,7 @@ import os
 import uvicorn
 from typing import Optional
 from google.cloud import bigquery
-from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed
+from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data
 import logging
 
 
@@ -26,6 +26,11 @@ class NewsRequest(BaseModel):
     write_table: Optional[str]= 'clean_news_data'
     meta_data_table: Optional[str] = 'raw_news_meta_data'
     
+class TransferData(BaseModel):
+    project_id: Optional[str] = 'tomastestproject-433206'
+    dataset: Optional[str] = 'testdb_1'
+    fetch_table: Optional[str] = 'raw_news_data'
+    write_table: Optional[str]= 'clean_news_data'
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
 
@@ -59,7 +64,17 @@ def clean_news_endpoint(request: NewsRequest):
             logging.error(f"Error occurred: {e}")
             raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
 
+@app.post("/transfer_to_meta_data/")
+def transfer_to_meta_data_endpoint(request: TransferData):
+    try:
+        transfer_ids_to_meta_data(table_from='raw_news_data', table_to='raw_news_meta_data',
+                                  project_id='tomastestproject-433206', dataset='testdb_1',)
 
+    except Exception as e:
+            # Logga detaljer om felet och returnera ett HTTP-fel med detaljer
+            logging.error(f"Error occurred: {e}")
+            raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
+        
 
 # Kör appen om detta script är huvudscripten
 
