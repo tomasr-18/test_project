@@ -5,7 +5,7 @@ import os
 import uvicorn
 from typing import Optional
 from google.cloud import bigquery
-from clean_news import get_raw_news_from_big_query, clean_news_3, predict_sentiment, write_clean_news_to_bq, update_is_processed
+from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed
 import logging
 
 
@@ -24,6 +24,7 @@ class NewsRequest(BaseModel):
     dataset: Optional[str] = 'testdb_1'
     fetch_table: Optional[str] = 'raw_news_data'
     write_table: Optional[str]= 'clean_news_data'
+    meta_data_table: Optional[str] = 'raw_news_meta_data'
     
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
@@ -40,7 +41,7 @@ def clean_news_endpoint(request: NewsRequest):
             return {"message": "There is no unprocessed data to fetch."}
             
         # Rensa nyhetsdata
-        cleaned_df = clean_news_3(df=df)
+        cleaned_df = clean_news(df=df)
 
         # Gör sentimentanalyser
         predict_sentiment(df=cleaned_df)
@@ -48,7 +49,7 @@ def clean_news_endpoint(request: NewsRequest):
         # Skriv de rensade nyheterna till BigQuery och få antalet rader som skrevs
         rows_written = write_clean_news_to_bq(data=cleaned_df,table=request.write_table)
 
-        #update_is_processed(id_string=ids, table=request.fetch_table)
+        update_is_processed(id_string=ids, table=request.meta_data_table)
 
         # Returnera resultat som JSON
         return {"message": "Data cleaned and written to BigQuery successfully.", "rows_written": rows_written}

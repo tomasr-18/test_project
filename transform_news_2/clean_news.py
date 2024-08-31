@@ -32,7 +32,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
+def get_raw_news_from_big_query(raw_data_table='raw_news_data',meta_data_table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.
@@ -62,13 +62,15 @@ def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastes
     # Initiera BigQuery-klienten med service account
     client = bigquery.Client.from_service_account_info(service_account_info)
 
-    table_id = f"{project_id}.{dataset}.{table}"
+    raw_data_table_id = f"{project_id}.{dataset}.{raw_data_table}"
+    meta_data_table_id = f"{project_id}.{dataset}.{meta_data_table}"
+
 
     # Build your SQL query
     query = f"""
         SELECT unique_id, data,company
-        FROM `{table_id}`
-        WHERE is_processed IS FALSE
+        FROM `{raw_data_table_id}`
+        WHERE unique_id IN (SELECT unique_id FROM `{meta_data_table_id}` WHERE is_processed IS FALSE)
         """
 
     # Execute the SQL query
@@ -143,7 +145,7 @@ def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='
     print(f'raderna {id_string} har ändrats')
 
 
-def clean_news_3(df: pd.DataFrame) -> pd.DataFrame:
+def clean_news(df: pd.DataFrame) -> pd.DataFrame:
     """
     Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
 
@@ -192,44 +194,44 @@ def clean_news_3(df: pd.DataFrame) -> pd.DataFrame:
 
     return final_df
 
-def clean_news(df: pd.DataFrame) -> pd.DataFrame:
-    """
-        Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
+# def clean_news(df: pd.DataFrame) -> pd.DataFrame:
+#     """
+#         Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
 
-    This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
-    for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
-    one row per article with relevant information such as author, description, publication date, title, URL, 
-    source, company, and sentiment scores.
+#     This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
+#     for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
+#     one row per article with relevant information such as author, description, publication date, title, URL, 
+#     source, company, and sentiment scores.
 
-    """
-    # Förbered DataFrame
-    # Se till att 'data' kolumnen är en lista av artiklar
-    df.drop(columns=['unique_id'], inplace=True)
+#     """
+#     # Förbered DataFrame
+#     # Se till att 'data' kolumnen är en lista av artiklar
+#     df.drop(columns=['unique_id'], inplace=True)
 
-    df['data'] = df['data'].apply(lambda x: x.get(
-        'articles', []) if isinstance(x, dict) else [])
+#     df['data'] = df['data'].apply(lambda x: x.get(
+#         'articles', []) if isinstance(x, dict) else [])
 
-    # Explodera artiklar till separata rader
-    df_exploded = df.explode('data')
+#     # Explodera artiklar till separata rader
+#     df_exploded = df.explode('data')
 
-    # Normalisera JSON-data i 'data' kolumnen
-    articles_df = pd.json_normalize(df_exploded['data'])
+#     # Normalisera JSON-data i 'data' kolumnen
+#     articles_df = pd.json_normalize(df_exploded['data'])
 
-    # Lägg till övriga kolumner
-    # Kombinera normaliserad artikeldata med 'company' kolumnen
-    final_df = pd.concat(
-        [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
+#     # Lägg till övriga kolumner
+#     # Kombinera normaliserad artikeldata med 'company' kolumnen
+#     final_df = pd.concat(
+#         [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
 
-    final_df.drop(columns=['content', 'source.id', 'urlToImage'], inplace=True)
+#     final_df.drop(columns=['content', 'source.id', 'urlToImage'], inplace=True)
 
-    final_df['publishedAt'] = pd.to_datetime(
-        final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True)
+#     final_df['publishedAt'] = pd.to_datetime(
+#         final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True)
 
-    final_df.rename(columns={"source.name": "source_name",
-                             "publishedAt": "pub_date"},
-                    inplace=True
-                    )
-    return final_df
+#     final_df.rename(columns={"source.name": "source_name",
+#                              "publishedAt": "pub_date"},
+#                     inplace=True
+#                     )
+#     return final_df
 
 
 def make_sentiment_score(string: str) -> float:
