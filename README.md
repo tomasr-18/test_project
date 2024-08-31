@@ -10,3 +10,9 @@
 Kod som är deployad i GCP:
 -fetch_news
 -transform_news
+
+
+Ordning på workflows:
+fetch_news_ny
+update_news_meta_data
+clean_news_ny

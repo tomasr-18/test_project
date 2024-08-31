@@ -5,14 +5,14 @@ main:
     - call_service:
         call: http.post
         args:
-          url: "https://clean-news-app-ny-b3o5cypbia-ew.a.run.app/clean_news/"
+          url: "https://clean-news-app-ny-b3o5cypbia-ew.a.run.app/transfer_to_meta_data/"
           auth:
             type: OIDC  # Använd OpenID Connect för autentisering
           body:
-            project_id: "tomastestproject-433206"
-            dataset: "testdb_1"
-            fetch_table: "raw_news_data"
-            meta_data_table: "raw_news_meta_data"
+            project_id: 'tomastestproject-433206'
+            dataset: 'testdb_1'
+            table_from: 'raw_news_data'
+            table_to: 'raw_news_meta_data'
           headers:
             Content-Type: "application/json"
         result: service_response

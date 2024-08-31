@@ -40,3 +40,15 @@ gcloud workflows deploy clean_news_ny \
 
 
     gcloud workflows run clean_news_ny --location=europe-west1 --project=tomastestproject-433206
+
+
+    ---
+
+
+gcloud workflows deploy transfer-meta_data \
+    --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/update_news_meta_data.yaml\
+    --location=europe-west1 \
+    --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
+
+
+    gcloud workflows run transfer-meta_data --location=europe-west1 --project=tomastestproject-433206

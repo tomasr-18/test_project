@@ -29,8 +29,9 @@ class NewsRequest(BaseModel):
 class TransferData(BaseModel):
     project_id: Optional[str] = 'tomastestproject-433206'
     dataset: Optional[str] = 'testdb_1'
-    fetch_table: Optional[str] = 'raw_news_data'
-    write_table: Optional[str]= 'clean_news_data'
+    table_from: Optional[str] = 'raw_news_data'
+    table_to: Optional[str] = 'raw_news_meta_data'
+
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
 

@@ -1,69 +1,114 @@
 main:
   steps:
     - call_service_AAPL:
-        call: http.post
-        args:
-          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
-          auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
-          body:
-            company: "AAPL"
-            table_name: "raw_news_data"
-          headers:
-            Content-Type: "application/json"
-        result: service_response_AAPL
+        try:
+          steps:
+            - try_call_AAPL:
+                call: http.post
+                args:
+                  url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+                  auth:
+                    type: OIDC  # Använd OpenID Connect för autentisering
+                  body:
+                    company: "AAPL"
+                    table_name: "raw_news_data"
+                  headers:
+                    Content-Type: "application/json"
+                result: service_response_AAPL
+        except:
+          as: error_AAPL
+          steps:
+            - handle_error_AAPL:
+                assign:
+                  - service_response_AAPL: {"body": "Failed to fetch news for AAPL"}
 
     - call_service_GOOGL:
-        call: http.post
-        args:
-          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
-          auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
-          body:
-            company: "GOOGL"
-            table_name: "raw_news_data"
-          headers:
-            Content-Type: "application/json"
-        result: service_response_GOOGL
+        try:
+          steps:
+            - try_call_GOOGL:
+                call: http.post
+                args:
+                  url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+                  auth:
+                    type: OIDC  # Använd OpenID Connect för autentisering
+                  body:
+                    company: "GOOGL"
+                    table_name: "raw_news_data"
+                  headers:
+                    Content-Type: "application/json"
+                result: service_response_GOOGL
+        except:
+          as: error_GOOGL
+          steps:
+            - handle_error_GOOGL:
+                assign:
+                  - service_response_GOOGL: {"body": "Failed to fetch news for GOOGL"}
 
     - call_service_MSFT:
-        call: http.post
-        args:
-          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
-          auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
-          body:
-            company: "MSFT"
-            table_name: "raw_news_data"
-          headers:
-            Content-Type: "application/json"
-        result: service_response_MSFT
+        try:
+          steps:
+            - try_call_MSFT:
+                call: http.post
+                args:
+                  url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+                  auth:
+                    type: OIDC  # Använd OpenID Connect för autentisering
+                  body:
+                    company: "MSFT"
+                    table_name: "raw_news_data"
+                  headers:
+                    Content-Type: "application/json"
+                result: service_response_MSFT
+        except:
+          as: error_MSFT
+          steps:
+            - handle_error_MSFT:
+                assign:
+                  - service_response_MSFT: {"body": "Failed to fetch news for MSFT"}
 
     - call_service_AMZN:
-        call: http.post
-        args:
-          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
-          auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
-          body:
-            company: "AMZN"
-            table_name: "raw_news_data"
-          headers:
-            Content-Type: "application/json"
-        result: service_response_AMZN
+        try:
+          steps:
+            - try_call_AMZN:
+                call: http.post
+                args:
+                  url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+                  auth:
+                    type: OIDC  # Använd OpenID Connect för autentisering
+                  body:
+                    company: "AMZN"
+                    table_name: "raw_news_data"
+                  headers:
+                    Content-Type: "application/json"
+                result: service_response_AMZN
+        except:
+          as: error_AMZN
+          steps:
+            - handle_error_AMZN:
+                assign:
+                  - service_response_AMZN: {"body": "Failed to fetch news for AMZN"}
 
     - call_service_TSLA:
-        call: http.post
-        args:
-          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
-          auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
-          body:
-            company: "TSLA"
-            table_name: "raw_news_data"
-          headers:
-            Content-Type: "application/json"
-        result: service_response_TSLA
+        try:
+          steps:
+            - try_call_TSLA:
+                call: http.post
+                args:
+                  url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+                  auth:
+                    type: OIDC  # Använd OpenID Connect för autentisering
+                  body:
+                    company: "TSLA"
+                    table_name: "raw_news_data"
+                  headers:
+                    Content-Type: "application/json"
+                result: service_response_TSLA
+        except:
+          as: error_TSLA
+          steps:
+            - handle_error_TSLA:
+                assign:
+                  - service_response_TSLA: {"body": "Failed to fetch news for TSLA"}
 
     - return_result:
         return: "Processing completed for all companies. Responses: AAPL=${service_response_AAPL.body}, GOOGL=${service_response_GOOGL.body}, MSFT=${service_response_MSFT.body}, AMZN=${service_response_AMZN.body}, TSLA=${service_response_TSLA.body}"
