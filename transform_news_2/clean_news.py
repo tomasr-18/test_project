@@ -1,11 +1,9 @@
-import time
 import pandas as pd
 from google.cloud import bigquery
-import os
 from nltk.sentiment import SentimentIntensityAnalyzer
 from google.cloud import secretmanager
 import json
-import time
+from google.api_core.exceptions import GoogleAPIError, NotFound
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -281,6 +279,46 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_
     else:
         return f'{job.output_rows} rader sparades till {table}'
 
+
+def transfer_ids_to_meta_data(table_from='raw_news_data', table_to='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
+    try:
+        # Initiera BigQuery-klienten
+
+        # Hämta JSON-sträng från Secret Manager
+        secret_data = get_secret(secret)
+
+        # Ladda JSON-strängen till en dictionary
+        service_account_info = json.loads(secret_data)
+
+        # Initiera BigQuery-klienten med service account
+        client = bigquery.Client.from_service_account_info(
+            service_account_info)
+
+        # Definiera din dataset och tabell
+        meta_data_table = f"{project_id}.{dataset}.{table_to}"
+        raw_data_table = f"{project_id}.{dataset}.{table_from}"
+        query = f"""
+                    INSERT INTO `{meta_data_table}` (unique_id, is_processed)
+                    SELECT unique_id, FALSE
+                    FROM `{raw_data_table}`
+                    WHERE unique_id NOT IN (
+                    SELECT unique_id
+                    FROM `{meta_data_table}`)
+                """
+        # Infoga data till BigQuery
+        errors = client.query(query)
+
+    except NotFound:
+        print(f"Error: The table {meta_data_table} was not found.")
+        raise
+
+    except GoogleAPIError as e:
+        print(f"Google API Error: {e}")
+        raise
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise
 
 def make_table(table_name='clean_news', project_id='tomastestproject-433206', database='testdb_1'):
     """
