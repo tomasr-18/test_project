@@ -117,9 +117,7 @@ def update_is_processed_2(id_string: str, table='raw_news_meta_data', project_id
     job.result()  # Vänta på att jobbet ska slutföras
 
     
-    
-
-def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
+def update_is_processed(id_string: str, table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
 
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
