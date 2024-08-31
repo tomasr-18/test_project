@@ -40,7 +40,7 @@ def clean_news_endpoint(request: NewsRequest):
     try:
         # Hämta data från BigQuery
         df,ids = get_raw_news_from_big_query(
-            table=request.fetch_table, project_id=request.project_id, dataset=request.dataset)
+            raw_data_table=request.fetch_table, meta_data_table=request.meta_data_table, project_id=request.project_id, dataset=request.dataset)
         
         if df is None or ids is None or df.empty:
             return {"message": "There is no unprocessed data to fetch."}
