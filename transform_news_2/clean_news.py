@@ -1,9 +1,9 @@
 import pandas as pd
 from google.cloud import bigquery
-import os
 from nltk.sentiment import SentimentIntensityAnalyzer
 from google.cloud import secretmanager
 import json
+from google.api_core.exceptions import GoogleAPIError, NotFound
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -30,7 +30,10 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
+def get_raw_news_from_big_query(raw_data_table='raw_news_data',
+                                meta_data_table='raw_news_meta_data', 
+                                project_id='tomastestproject-433206', 
+                                dataset='testdb_1'):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.
@@ -60,13 +63,16 @@ def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastes
     # Initiera BigQuery-klienten med service account
     client = bigquery.Client.from_service_account_info(service_account_info)
 
-    table_id = f"{project_id}.{dataset}.{table}"
+    raw_data_table_id = f"{project_id}.{dataset}.{raw_data_table}"
+    meta_data_table_id = f"{project_id}.{dataset}.{meta_data_table}"
+
 
     # Build your SQL query
     query = f"""
         SELECT unique_id, data,company
-        FROM `{table_id}`
-        WHERE is_processed IS FALSE
+        FROM `{raw_data_table_id}`
+        WHERE unique_id IN (SELECT unique_id FROM `{meta_data_table_id}` 
+        WHERE is_processed IS FALSE)
         """
 
     # Execute the SQL query
@@ -85,12 +91,14 @@ def get_raw_news_from_big_query(table='raw_news_with_uuid', project_id='tomastes
     # Create a comma-separated string of unique IDs
     processed_id_list = df["unique_id"].to_list()
     id_str = ', '.join(f"'{id}'" for id in processed_id_list)
-    print(id_str)
 
     return df, id_str
 
 
-def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='tomastestproject-433206', dataset='testdb_1'):
+def update_is_processed(id_string: str,
+                        table='raw_news_meta_data', 
+                        project_id='tomastestproject-433206', 
+                        dataset='testdb_1'):
 
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
@@ -116,7 +124,7 @@ def update_is_processed(id_string: str, table='raw_news_with_uuid', project_id='
     print(f'raderna {id_string} har ändrats')
 
 
-def clean_news_3(df: pd.DataFrame) -> pd.DataFrame:
+def clean_news(df: pd.DataFrame) -> pd.DataFrame:
     """
     Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
 
@@ -165,44 +173,44 @@ def clean_news_3(df: pd.DataFrame) -> pd.DataFrame:
 
     return final_df
 
-def clean_news(df: pd.DataFrame) -> pd.DataFrame:
-    """
-        Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
+# def clean_news(df: pd.DataFrame) -> pd.DataFrame:
+#     """
+#         Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
 
-    This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
-    for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
-    one row per article with relevant information such as author, description, publication date, title, URL, 
-    source, company, and sentiment scores.
+#     This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
+#     for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
+#     one row per article with relevant information such as author, description, publication date, title, URL, 
+#     source, company, and sentiment scores.
 
-    """
-    # Förbered DataFrame
-    # Se till att 'data' kolumnen är en lista av artiklar
-    df.drop(columns=['unique_id'], inplace=True)
+#     """
+#     # Förbered DataFrame
+#     # Se till att 'data' kolumnen är en lista av artiklar
+#     df.drop(columns=['unique_id'], inplace=True)
 
-    df['data'] = df['data'].apply(lambda x: x.get(
-        'articles', []) if isinstance(x, dict) else [])
+#     df['data'] = df['data'].apply(lambda x: x.get(
+#         'articles', []) if isinstance(x, dict) else [])
 
-    # Explodera artiklar till separata rader
-    df_exploded = df.explode('data')
+#     # Explodera artiklar till separata rader
+#     df_exploded = df.explode('data')
 
-    # Normalisera JSON-data i 'data' kolumnen
-    articles_df = pd.json_normalize(df_exploded['data'])
+#     # Normalisera JSON-data i 'data' kolumnen
+#     articles_df = pd.json_normalize(df_exploded['data'])
 
-    # Lägg till övriga kolumner
-    # Kombinera normaliserad artikeldata med 'company' kolumnen
-    final_df = pd.concat(
-        [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
+#     # Lägg till övriga kolumner
+#     # Kombinera normaliserad artikeldata med 'company' kolumnen
+#     final_df = pd.concat(
+#         [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
 
-    final_df.drop(columns=['content', 'source.id', 'urlToImage'], inplace=True)
+#     final_df.drop(columns=['content', 'source.id', 'urlToImage'], inplace=True)
 
-    final_df['publishedAt'] = pd.to_datetime(
-        final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True)
+#     final_df['publishedAt'] = pd.to_datetime(
+#         final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True)
 
-    final_df.rename(columns={"source.name": "source_name",
-                             "publishedAt": "pub_date"},
-                    inplace=True
-                    )
-    return final_df
+#     final_df.rename(columns={"source.name": "source_name",
+#                              "publishedAt": "pub_date"},
+#                     inplace=True
+#                     )
+#     return final_df
 
 
 def make_sentiment_score(string: str) -> float:
@@ -224,7 +232,10 @@ def predict_sentiment(df: pd.DataFrame):
     df['score_title'] = df['title'].apply(make_sentiment_score)
 
 
-def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_id='tomastestproject-433206', dataset='testdb_1'):
+def write_clean_news_to_bq(data: pd.DataFrame, 
+                           table='clean_news_copy', 
+                           project_id='tomastestproject-433206', 
+                           dataset='testdb_1'):
     """
     Writes cleaned data to Big Query
     """
@@ -254,6 +265,51 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_
     else:
         return f'{job.output_rows} rader sparades till {table}'
 
+
+def transfer_ids_to_meta_data(table_from='raw_news_data', 
+                              table_to='raw_news_meta_data', 
+                              project_id='tomastestproject-433206', 
+                              dataset='testdb_1', 
+                              secret='bigquery-accout-secret'
+                              ):
+    try:
+        # Initiera BigQuery-klienten
+
+        # Hämta JSON-sträng från Secret Manager
+        secret_data = get_secret(secret)
+
+        # Ladda JSON-strängen till en dictionary
+        service_account_info = json.loads(secret_data)
+
+        # Initiera BigQuery-klienten med service account
+        client = bigquery.Client.from_service_account_info(
+            service_account_info)
+
+        # Definiera din dataset och tabell
+        meta_data_table = f"{project_id}.{dataset}.{table_to}"
+        raw_data_table = f"{project_id}.{dataset}.{table_from}"
+        query = f"""
+                    INSERT INTO `{meta_data_table}` (unique_id, is_processed)
+                    SELECT unique_id, FALSE
+                    FROM `{raw_data_table}`
+                    WHERE unique_id NOT IN (
+                    SELECT unique_id
+                    FROM `{meta_data_table}`)
+                """
+        # Infoga data till BigQuery
+        errors = client.query(query)
+
+    except NotFound:
+        print(f"Error: The table {meta_data_table} was not found.")
+        raise
+
+    except GoogleAPIError as e:
+        print(f"Google API Error: {e}")
+        raise
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise
 
 def make_table(table_name='clean_news', project_id='tomastestproject-433206', database='testdb_1'):
     """

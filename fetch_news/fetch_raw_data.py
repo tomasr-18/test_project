@@ -5,6 +5,7 @@ from google.cloud import bigquery
 from datetime import datetime, timedelta
 import json
 from google.cloud import secretmanager
+import uuid
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -31,8 +32,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 def fetch_news(company: str, api_key: str,
-             from_date: str = (
-                 datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
+             from_date: str = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
              to_date: str = datetime.now().strftime('%Y-%m-%d'),
              sort_by: str = 'relevance',
              language: str = 'en') -> dict:
@@ -77,7 +77,12 @@ def fetch_news(company: str, api_key: str,
         raise
 
 
-def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
+def save_raw_data_to_big_query(data: dict, 
+                               company: str, 
+                               table='raw_news', 
+                               project_id='tomastestproject-433206', 
+                               dataset='testdb_1', 
+                               secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
 
@@ -106,9 +111,6 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
             service_account_info)
     
 
-        # .from_service_account_json(
-        #     'news/tomastestproject-433206-adc5bc090976.json')
-
         # Lägg till dagens datum i data-dict
         fetch_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -116,7 +118,8 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         rows_to_insert = [{
             "data": json.dumps(data),  # JSON-sträng för din data
             "fetch_date": fetch_date,  # Datum som en separat kolumn
-            "company": company
+            "company": company,
+            "unique_id": str(uuid.uuid4())
         }]
 
         # Definiera din dataset och tabell
@@ -145,5 +148,7 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
         print(f"An unexpected error occurred: {e}")
         raise
 
+
 if __name__=='__main__':
-    print(get_secret())
+    #print(get_secret())
+    pass

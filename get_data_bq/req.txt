@@ -1,9 +1,0 @@
-google-cloud-bigquery
-requests
-python-dotenv
-fastapi
-pandas
-db-dtypes
-nltk
-pydantic
-uvicorn

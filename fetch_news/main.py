@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
 import os
-from fetch_raw_data import fetch_news,save_raw_data_to_big_query  
+from fetch_raw_data import fetch_news,save_raw_data_to_big_query
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,6 +37,8 @@ def fetch_news_and_save(params: QueryParameters):
 
         # 2. Spara data till BigQuery
         save_raw_data_to_big_query(data=news_data, company=params.company,table=params.table_name)
+
+        
 
         # 3. Returnera framgångsmeddelande med hämtade data
         return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults']}
