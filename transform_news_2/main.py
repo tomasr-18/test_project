@@ -41,7 +41,11 @@ def clean_news_endpoint(request: NewsRequest):
     try:
         # Hämta data från BigQuery
         df,ids = get_raw_news_from_big_query(
-            raw_data_table=request.fetch_table, meta_data_table=request.meta_data_table, project_id=request.project_id, dataset=request.dataset)
+                                            raw_data_table=request.fetch_table, 
+                                            meta_data_table=request.meta_data_table, 
+                                            project_id=request.project_id, 
+                                            dataset=request.dataset
+                                            )
         
         if df is None or ids is None or df.empty:
             return {"message": "There is no unprocessed data to fetch."}
@@ -66,10 +70,14 @@ def clean_news_endpoint(request: NewsRequest):
             raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
 
 @app.post("/transfer_to_meta_data/")
-def transfer_to_meta_data_endpoint():
+def transfer_to_meta_data_endpoint(request:TransferData):
     try:
-        transfer_ids_to_meta_data(table_from='raw_news_data', table_to='raw_news_meta_data',
-                                  project_id='tomastestproject-433206', dataset='testdb_1',)
+        transfer_ids_to_meta_data(
+                                table_from=request.table_from,
+                                table_to=request.table_to,
+                                project_id=request.project_id,
+                                dataset=request.dataset
+                                )
 
     except Exception as e:
             # Logga detaljer om felet och returnera ett HTTP-fel med detaljer

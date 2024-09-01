@@ -249,7 +249,10 @@ def predict_sentiment(df: pd.DataFrame):
     df['score_title'] = df['title'].apply(make_sentiment_score)
 
 
-def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_id='tomastestproject-433206', dataset='testdb_1'):
+def write_clean_news_to_bq(data: pd.DataFrame, 
+                           table='clean_news_copy', 
+                           project_id='tomastestproject-433206', 
+                           dataset='testdb_1'):
     """
     Writes cleaned data to Big Query
     """
@@ -280,7 +283,12 @@ def write_clean_news_to_bq(data: pd.DataFrame, table='clean_news_copy', project_
         return f'{job.output_rows} rader sparades till {table}'
 
 
-def transfer_ids_to_meta_data(table_from='raw_news_data', table_to='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
+def transfer_ids_to_meta_data(table_from='raw_news_data', 
+                              table_to='raw_news_meta_data', 
+                              project_id='tomastestproject-433206', 
+                              dataset='testdb_1', 
+                              secret='bigquery-accout-secret'
+                              ):
     try:
         # Initiera BigQuery-klienten
 

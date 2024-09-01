@@ -32,8 +32,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 def fetch_news(company: str, api_key: str,
-             from_date: str = (
-                 datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
+             from_date: str = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
              to_date: str = datetime.now().strftime('%Y-%m-%d'),
              sort_by: str = 'relevance',
              language: str = 'en') -> dict:
@@ -78,7 +77,12 @@ def fetch_news(company: str, api_key: str,
         raise
 
 
-def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', project_id='tomastestproject-433206', dataset='testdb_1', secret='bigquery-accout-secret'):
+def save_raw_data_to_big_query(data: dict, 
+                               company: str, 
+                               table='raw_news', 
+                               project_id='tomastestproject-433206', 
+                               dataset='testdb_1', 
+                               secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
 
