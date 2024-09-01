@@ -30,7 +30,10 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(raw_data_table='raw_news_data',meta_data_table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
+def get_raw_news_from_big_query(raw_data_table='raw_news_data',
+                                meta_data_table='raw_news_meta_data', 
+                                project_id='tomastestproject-433206', 
+                                dataset='testdb_1'):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.
@@ -68,7 +71,8 @@ def get_raw_news_from_big_query(raw_data_table='raw_news_data',meta_data_table='
     query = f"""
         SELECT unique_id, data,company
         FROM `{raw_data_table_id}`
-        WHERE unique_id IN (SELECT unique_id FROM `{meta_data_table_id}` WHERE is_processed IS FALSE)
+        WHERE unique_id IN (SELECT unique_id FROM `{meta_data_table_id}` 
+        WHERE is_processed IS FALSE)
         """
 
     # Execute the SQL query
@@ -91,31 +95,10 @@ def get_raw_news_from_big_query(raw_data_table='raw_news_data',meta_data_table='
     return df, id_str
 
 
-def update_is_processed_2(id_string: str, table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
-
-    table_id = f"{project_id}.{dataset}.{table}"
-    secret_data = get_secret()
-
-    # Ladda JSON-strängen till en dictionary
-    service_account_info = json.loads(secret_data)
-
-    # Initiera BigQuery-klienten med service account
-    client = bigquery.Client.from_service_account_info(
-        service_account_info)
-
-    # Konstruera SQL-frågan
-    query = f"""
-    UPDATE `{table_id}`
-    SET is_processed = TRUE
-    WHERE unique_id IN ({id_string});
-    """
-
-    # Kör frågan
-    job = client.query(query)
-    job.result()  # Vänta på att jobbet ska slutföras
-
-    
-def update_is_processed(id_string: str, table='raw_news_meta_data', project_id='tomastestproject-433206', dataset='testdb_1'):
+def update_is_processed(id_string: str,
+                        table='raw_news_meta_data', 
+                        project_id='tomastestproject-433206', 
+                        dataset='testdb_1'):
 
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
