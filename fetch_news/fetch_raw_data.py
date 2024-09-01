@@ -115,7 +115,6 @@ def save_raw_data_to_big_query(data: dict, company: str, table='raw_news', proje
             "data": json.dumps(data),  # JSON-sträng för din data
             "fetch_date": fetch_date,  # Datum som en separat kolumn
             "company": company,
-            "is_processed": False,
             "unique_id": str(uuid.uuid4())
         }]
 
