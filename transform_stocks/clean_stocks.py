@@ -52,7 +52,7 @@ def clean_stock_data():
     Fetches raw stock data from BigQuery, cleans it, and inserts the cleaned data back into BigQuery.
     """
     try:
-        # Query to fetch raw data from BigQuery
+        ## Query to fetch raw data from BigQuery
         query = f"""
             SELECT stock_symbol, raw_data
             FROM `{RAW_DATA_TABLE_ID}`
