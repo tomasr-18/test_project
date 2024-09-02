@@ -2,7 +2,7 @@
 FROM python:3.9-slim
 
 # Set the working directory in the container
-WORKDIR /transform_stocks
+WORKDIR /fetch_stocks_raw
 
 # Copy the requirements file into the container
 COPY req.txt .
