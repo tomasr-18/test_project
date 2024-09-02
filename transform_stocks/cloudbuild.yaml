@@ -1,21 +1,25 @@
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks', '-f', 'transform_stocks/dockerfile', 'transform_stocks']
+    args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img', '-f', 'transform_stocks/dockerfile', 'transform_stocks']
 
   # Step 2: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks']
+    args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img']
 
   # Step 3: Deploy the Docker image to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args: ['run', 'deploy', 'fastapi-clean-stocks', '--image', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks', '--platform', 'managed', '--region', 'us-central1', '--allow-unauthenticated']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['run', 'deploy', 'fastapi-clean-stocks', 
+           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img',
+           '--platform', 'managed',
+           '--region', 'europe-west1',
+           '--allow-unauthenticated']
 
 images:
-  - 'gcr.io/$PROJECT_ID/fastapi-clean-stocks'
-
+  - 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-raw-news/fetch-raw-news-img'
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Replace with your actual Cloud Build service account
