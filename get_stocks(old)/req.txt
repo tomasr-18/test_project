@@ -1,6 +1,0 @@
-google-cloud-bigquery
-requests
-python-dotenv
-pandas
-db-dtypes
-fastapi
