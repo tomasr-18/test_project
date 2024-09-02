@@ -9,6 +9,33 @@ from fastapi.responses import JSONResponse
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from dotenv import load_dotenv
+from google.cloud import secretmanager
+from google.api_core.exceptions import GoogleAPIError, NotFound
+
+
+def get_secret(secret_name='bigquery-accout-secret') -> str:
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
+    response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
+    secret_data = response.payload.data.decode('UTF-8')
+
+    return secret_data
 
 # Load environment variables from .env file
 load_dotenv(dotenv_path='/home/psor/testgit/test_project/get_stocks_raw/.env')
