@@ -12,5 +12,10 @@ steps:
     entrypoint: 'gcloud'
     args: ['run', 'deploy', 'fastapi-clean-stocks', '--image', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks', '--platform', 'managed', '--region', 'us-central1', '--allow-unauthenticated']
 
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+
 images:
   - 'gcr.io/$PROJECT_ID/fastapi-clean-stocks'
