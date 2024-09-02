@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
-from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq
+from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, grite_clean_news_to_bq
 
 # Ladda dina funktioner (se till att de finns i samma fil eller att de importeras korrekt)
 # Om de är i en annan fil, använd: from <file_name> import <function_name>
