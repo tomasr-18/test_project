@@ -1,0 +1,23 @@
+main:
+  steps:
+    - call_service_AAPL:
+  
+        call: http.post
+        args:
+          url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
+          auth:
+            type: OIDC  # Använd OpenID Connect för autentisering
+          body:
+            table_name: "raw_news_data"
+            company: "AAPL"
+            from_date: "2024-08-02"
+            to_date: "2024-09-01"
+          headers:
+            Content-Type: "application/json"
+        result: service_response_AAPL
+
+
+
+
+
+
