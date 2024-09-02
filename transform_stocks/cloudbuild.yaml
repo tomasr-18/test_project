@@ -1,7 +1,7 @@
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks', '-f', 'transform_stocks/dockerfile', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/fastapi-clean-stocks', '-f', 'transform_stocks/dockerfile', 'transform_stocks']
 
   # Step 2: Push the Docker image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
