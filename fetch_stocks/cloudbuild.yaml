@@ -8,14 +8,21 @@ steps:
       'fetch_stocks_raw'
     ]
 
-  # Step 2: Push the Docker image to Artifact Registry
+  # Step 2: Verify the Docker image is built
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'images', 
+      'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
+    ]
+
+  # Step 3: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push', 
       'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
     ]
 
-  # Step 3: Deploy the Docker image to Cloud Run
+  # Step 4: Deploy the Docker image to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     args: [
       'run', 'deploy', 'fetch-stocks-raw-data-app', 
