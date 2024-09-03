@@ -40,7 +40,7 @@ def fetch_news_and_save(params: QueryParameters):
         
 
         # 3. Returnera framgångsmeddelande med hämtade data
-        return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults'],"from_date":f"{params.from_date}","to_date":f"{params.to_date}"}
+        return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults'],"from_date":f"{params.from_date}","to_date":f"{params.to_date}","company":f"{params.company}"}
 
     except HTTPException as e:
         raise e
