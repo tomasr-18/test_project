@@ -4,8 +4,8 @@ steps:
     args: [
       'build', 
       '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img', 
-      '-f', 'Dockerfile',  # Ensure the Dockerfile path is correct relative to the context
-      '.'
+      '-f', 'fetch_stocks/dockerfile',  # Correct path to the Dockerfile
+      'fetch_stocks'  # Context directory
     ]
 
   # Step 2: Verify the Docker image is built
