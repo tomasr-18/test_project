@@ -304,7 +304,7 @@ def transfer_ids_to_meta_data(table_from='raw_news_data',
 
         # Retrieve the number of rows affected by the query
         rows_inserted = result.num_dml_affected_rows
-        return {"messege":f"{rows_inserted} rows inserted to {meta_data_table}"}
+        return rows_inserted
     except NotFound:
         print(f"Error: The table {meta_data_table} was not found.")
         raise
