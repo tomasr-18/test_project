@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from google.cloud import secretmanager
 import uvicorn
 
-
+load_dotenv()
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -39,15 +39,12 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 # Load environment variables
-STOCK_API_KEY = os.getenv('STOCK_API_KEY') or get_secret('stock-api-key')
-PROJECT_ID = os.environ.get('PROJECT_ID') or get_secret('project-id')
-RAW_DATA_TABLE_ID = os.getenv('RAW_DATA_TABLE_ID') or get_secret('raw-data-table-id')
-CLEANED_DATA_TABLE_ID = os.getenv('CLEANED_DATA_TABLE_ID') or get_secret('clean-stock-data-table-id')
+STOCK_API_KEY = os.getenv('STOCK_API_KEY') 
+PROJECT_ID = os.environ.get('PROJECT_ID') 
+RAW_DATA_TABLE_ID = os.getenv('RAW_DATA_TABLE_ID') 
+CLEANED_DATA_TABLE_ID = os.getenv('CLEANED_DATA_TABLE_ID')
 
-# Initialize BigQuery client
-# Initialize FastAPI app
 app = FastAPI()
-
 @app.post("/clean-stock-data/")
 def clean_stock_data():
     """
@@ -72,7 +69,7 @@ def clean_stock_data():
         rows_to_insert = []
         for row in results:
             stock_symbol = row.stock_symbol
-            raw_data_str = json.loads(row.raw_data)  # Parse the JSON string
+            raw_data_str = row.raw_data  # Parse the JSON string
             
             # Parse the JSON-like structure of raw_data_str
             time_series = raw_data_str.get("Time Series (Daily)", {})
