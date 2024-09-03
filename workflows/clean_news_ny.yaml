@@ -18,4 +18,4 @@ main:
         result: service_response
 
     - return_result:
-        return: "Processing completed. Response: ${service_response.body}"
+        return: ${service_response.body}

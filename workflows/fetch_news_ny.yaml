@@ -111,4 +111,9 @@ main:
                   - service_response_TSLA: {"body": "Failed to fetch news for TSLA"}
 
     - return_result:
-        return: "Processing completed for all companies. Responses: AAPL=${service_response_AAPL.body}, GOOGL=${service_response_GOOGL.body}, MSFT=${service_response_MSFT.body}, AMZN=${service_response_AMZN.body}, TSLA=${service_response_TSLA.body}"
+        return: 
+        - ${service_response_AAPL.body}
+        - ${service_response_GOOGL.body}
+        - ${service_response_MSFT.body}
+        - ${service_response_AMZN.body}
+        - ${service_response_TSLA.body}
