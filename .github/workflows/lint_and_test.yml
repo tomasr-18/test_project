@@ -32,4 +32,10 @@ jobs:
 
     - name: Run Tests
       run: |
-        pytest
+        # Check if there are any test files before running pytest
+        if ls **/test_*.py 1> /dev/null 2>&1; then
+          echo "Test files found, running pytest..."
+          pytest
+        else
+          echo "No test files found, skipping tests."
+        fi
