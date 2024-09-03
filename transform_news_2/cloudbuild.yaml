@@ -7,8 +7,7 @@ steps:
   args: ['run', 'deploy', 'clean-news-app-ny', 
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-news-ny/clean-news-img-ny',
           '--platform', 'managed',
-          '--region', 'europe-west1',
-          '--allow-unauthenticated']
+          '--region', 'europe-west1']
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET

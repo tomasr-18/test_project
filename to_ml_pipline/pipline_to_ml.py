@@ -4,10 +4,6 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 
 
-from google.cloud import bigquery
-import pandas as pd
-
-
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
 
@@ -69,14 +65,23 @@ def get_data_by_company(company: list[str],
         WHERE company IN ({company_str})
         """
 
-    # Execute the SQL query
-    query_job = client.query(query)
+    try:
+        # Execute the SQL query
+        query_job = client.query(query)
 
-    # Fetch the results of the query
-    results = query_job.result()
+        # Fetch the results of the query
+        results = query_job.result()
 
-    # Convert the query results into a pandas DataFrame
-    df = results.to_dataframe()
+        # Convert the query results into a pandas DataFrame
+        df = results.to_dataframe()
+
+        # Check if the DataFrame is empty
+        if df.empty:
+            print("Warning: The query returned no results.")
+            return pd.DataFrame()  # Return an empty DataFrame
+        
+    except Exception as e:
+        raise Exception(f"Failed to execute the query: {e}")
 
     # Return the DataFrame with the filtered data
     return df

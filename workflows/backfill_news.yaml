@@ -1,23 +1,40 @@
+
 main:
+  params: [event]
   steps:
-    - call_service_AAPL:
-  
+    - init_vars:
+        assign:
+          - table_name: "raw_news_data"
+          - company: ""
+          - from_date: ""
+          - to_date: ""
+
+    - decode_input:  # Assign incoming message directly   
+        assign:
+          - company: ${event.company}
+          - from_date: ${event.from_date}
+          - to_date: ${event.to_date}
+
+    - call_service:
         call: http.post
         args:
           url: "https://fetch-raw-news-app-b3o5cypbia-ew.a.run.app/fetch-news/"
           auth:
-            type: OIDC  # Använd OpenID Connect för autentisering
+            type: OIDC  # Use OpenID Connect for authentication
           body:
-            table_name: "raw_news_data"
-            company: "AAPL"
-            from_date: "2024-08-02"
-            to_date: "2024-09-01"
+            table_name: ${table_name}
+            company: ${company}
+            from_date: ${from_date}
+            to_date: ${to_date}
           headers:
             Content-Type: "application/json"
-        result: service_response_AAPL
+        result: service_response
+
+    - finish_workflow:   # End of Workflow and return the declared variables
+        return:
+          - ${event}
+          - ${service_response}
 
 
-
-
-
+          
 
