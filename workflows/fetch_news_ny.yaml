@@ -112,8 +112,8 @@ main:
 
     - return_result:
         return: 
-        - ${service_response_AAPL.body}
-        - ${service_response_GOOGL.body}
-        - ${service_response_MSFT.body}
-        - ${service_response_AMZN.body}
-        - ${service_response_TSLA.body}
+        - ${service_response_AAPL}
+        - ${service_response_GOOGL}
+        - ${service_response_MSFT}
+        - ${service_response_AMZN}
+        - ${service_response_TSLA}
