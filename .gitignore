@@ -14,6 +14,9 @@ transform_stocks/get_stocks_clean.ipynb
 transform_stocks/get_stocks_clean.py
 test.ipynb
 testing.ipynb
+fetch_stocks_raw.ipynb
+fetch_stocks_raw2.py
+fetch_stocks_raw_notebook.ipynb
 
 
 

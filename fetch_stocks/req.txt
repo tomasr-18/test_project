@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+requests
+pydantic
+google-cloud-bigquery
+google-auth
