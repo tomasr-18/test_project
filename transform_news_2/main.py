@@ -70,13 +70,13 @@ def clean_news_endpoint(request: NewsRequest):
 @app.post("/transfer_to_meta_data/")
 def transfer_to_meta_data_endpoint(request:TransferData):
     try:
-        transfer_ids_to_meta_data(
+        response_msg=transfer_ids_to_meta_data(
                                 table_from=request.table_from,
                                 table_to=request.table_to,
                                 project_id=request.project_id,
                                 dataset=request.dataset
                                 )
-
+        return {"messege": f"{response_msg} har flyttats till news_raw_meta_data"}
     except Exception as e:
             # Logga detaljer om felet och returnera ett HTTP-fel med detaljer
             logging.error(f"Error occurred: {e}")

@@ -121,7 +121,7 @@ def update_is_processed(id_string: str,
     # Kör frågan
     job = client.query(query)
     job.result()  # Vänta på att jobbet ska slutföras
-    return (f'raderna {id_string} har ändrats')
+    return id_string
 
 
 def clean_news(df: pd.DataFrame) -> pd.DataFrame:
