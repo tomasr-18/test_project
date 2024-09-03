@@ -28,7 +28,7 @@ jobs:
 
     - name: Run Ruff Linting
       run: |
-        ruff check . --config .pyproject.toml
+        ruff check . --config pyproject.toml
 
     - name: Run Tests
       run: |
