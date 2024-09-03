@@ -1,8 +1,7 @@
 from google.api_core.exceptions import GoogleAPIError, NotFound
-from datetime import datetime
 import requests
 from google.cloud import bigquery
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 import json
 from google.cloud import secretmanager
 import uuid
@@ -32,8 +31,10 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 def fetch_news(company: str, api_key: str,
-             from_date: str = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
-             to_date: str = datetime.now().strftime('%Y-%m-%d'),
+               from_date: str = ((datetime.now(timezone.utc)) -
+                                 timedelta(days=1)).strftime('%Y-%m-%d'),
+               to_date: str = ((datetime.now(timezone.utc)) -
+                               timedelta(days=1)).strftime('%Y-%m-%d'),
              sort_by: str = 'relevance',
              language: str = 'en') -> dict:
     """
@@ -43,7 +44,7 @@ def fetch_news(company: str, api_key: str,
         company (str): Namnet på företaget som ska sökas efter.
         api_key (str): API-nyckeln för att autentisera mot NewsAPI.
         from_date (str): Startdatum för sökningen (format 'YYYY-MM-DD'). Standard är gårdagen.
-        to_date (str): Slutdatum för sökningen (format 'YYYY-MM-DD'). Standard är dagens datum.
+        to_date (str): Slutdatum för sökningen (format 'YYYY-MM-DD'). Standard är gårdagensdagens datum.
         sort_by (str): Sorteringskriterium (t.ex. 'relevance'). Standard är 'relevance'.
         language (str): Språk för nyheterna. Standard är 'en'.
     
