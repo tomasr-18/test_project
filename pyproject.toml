@@ -1,0 +1,6 @@
+[tool.ruff]
+exclude = [
+    "transform_stocks/",
+    "fetch_stocks_raw/",
+    "transform_news_2/"
+]
