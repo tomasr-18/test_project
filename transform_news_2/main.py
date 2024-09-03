@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
 from typing import Optional
-from google.cloud import bigquery
 from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data
 import logging
 
