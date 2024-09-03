@@ -1,7 +1,7 @@
 from google.api_core.exceptions import GoogleAPIError, NotFound
 import requests
 from google.cloud import bigquery
-from datetime import datetime, timedelta,timezone
+from datetime import datetime
 import json
 from google.cloud import secretmanager
 import uuid
