@@ -31,10 +31,8 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 def fetch_news(company: str, api_key: str,
-               from_date: str = ((datetime.now(timezone.utc)) -
-                                 timedelta(days=1)).strftime('%Y-%m-%d'),
-               to_date: str = ((datetime.now(timezone.utc)) -
-                               timedelta(days=1)).strftime('%Y-%m-%d'),
+               from_date: str,
+               to_date: str,
              sort_by: str = 'relevance',
              language: str = 'en') -> dict:
     """
@@ -43,8 +41,8 @@ def fetch_news(company: str, api_key: str,
     Args:
         company (str): Namnet på företaget som ska sökas efter.
         api_key (str): API-nyckeln för att autentisera mot NewsAPI.
-        from_date (str): Startdatum för sökningen (format 'YYYY-MM-DD'). Standard är gårdagen.
-        to_date (str): Slutdatum för sökningen (format 'YYYY-MM-DD'). Standard är gårdagensdagens datum.
+        from_date (str): Startdatum för sökningen (format 'YYYY-MM-DD')
+        to_date (str): Slutdatum för sökningen (format 'YYYY-MM-DD')
         sort_by (str): Sorteringskriterium (t.ex. 'relevance'). Standard är 'relevance'.
         language (str): Språk för nyheterna. Standard är 'en'.
     
@@ -125,7 +123,7 @@ def save_raw_data_to_big_query(data: dict,
 
         # Definiera din dataset och tabell
         table_id = f"{project_id}.{dataset}.{table}"
-        print(f"Table ID: {table_id}")
+        #print(f"Table ID: {table_id}")
 
         # Infoga data till BigQuery
         errors = client.insert_rows_json(table_id, rows_to_insert)
