@@ -10,10 +10,9 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 from dotenv import load_dotenv
 from google.cloud import secretmanager
-import structlog
+import uvicorn
 
-# Initialize structured logging
-logger = structlog.get_logger()
+
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -48,11 +47,6 @@ CLEANED_DATA_TABLE_ID = os.getenv('CLEANED_DATA_TABLE_ID') or get_secret('clean-
 # Initialize BigQuery client
 # Initialize FastAPI app
 app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Stock Data API"}
 
 @app.post("/clean-stock-data/")
 def clean_stock_data():
@@ -107,3 +101,5 @@ def clean_stock_data():
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
