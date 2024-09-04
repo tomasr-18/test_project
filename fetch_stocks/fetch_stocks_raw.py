@@ -1,6 +1,6 @@
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -9,7 +9,6 @@ from google.oauth2 import service_account
 from dotenv import load_dotenv
 from google.cloud import secretmanager
 import uvicorn
-from typing import Dict
 from pydantic import BaseModel
 
 load_dotenv()
@@ -79,16 +78,17 @@ def fetch_raw_stock_data(stock_symbol: str) -> dict:
         print(f"Error in API response: {ve}")
         raise HTTPException(status_code=500, detail=f"API response error: {ve}")
 
-def save_raw_stock_data(stock_symbol: str, stock_data=dict) -> None:
+def save_raw_stock_data(stock_symbol: str, stock_data : dict, raw_data_table_id: str) -> JSONResponse:
     """
     Saves raw stock data to BigQuery.
 
     Args:
         stock_symbol (str): The stock symbol.
         stock_data (dict): The raw stock data to save.
+        raw_data_table_id (str): The ID of the BigQuery table to save the data to.
     """
     try: 
-        fetch_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        fetch_date = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
         # Create a BigQuery client
         credentials = service_account.Credentials.from_service_account_info(json.loads(get_secret()))
@@ -104,7 +104,7 @@ def save_raw_stock_data(stock_symbol: str, stock_data=dict) -> None:
         ]
 
         # Insert rows into BigQuery
-        errors = client.insert_rows_json(RAW_DATA_TABLE_ID, rows_to_insert)
+        errors = client.insert_rows_json(raw_data_table_id, rows_to_insert)
 
         if errors:
             raise HTTPException(status_code=500, detail=f"Encountered errors while inserting rows: {errors}")
@@ -120,9 +120,10 @@ async def handle_raw_stock_data(stock_request: StockRequest):
     try:
         # Fetch raw stock data
         data = fetch_raw_stock_data(stock_request.stock_symbol)
+    
 
         # Save raw stock data to BigQuery
-        save_raw_stock_data(stock_request.stock_symbol, data)
+        save_raw_stock_data(stock_symbol=stock_request.stock_symbol, stock_data=data, raw_data_table_id=os.getenv('RAW_DATA_TABLE_ID')) 
         
         return JSONResponse(content={"message": "Rows successfully inserted."})
     except HTTPException as e:
