@@ -1,22 +1,37 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+import functions_framework
 import json
 from google.cloud import bigquery, secretmanager
 from google.api_core.exceptions import NotFound
+from pydantic import BaseModel, Field
+from typing import Dict, Any
 
-app = FastAPI()
+# Definiera en modell för förfrågning
 
 
-@app.post("/create-bigquery-table/")
-def create_bigquery_table(request: BaseModel):
-    data = request.model_dump()
-    table_name = data.get("table_name")
-    table_type = data.get("table_type")
+class RequestModel(BaseModel):
+    table_name: str
+    table_type: str
+    project_id: str = Field(default="tomastestproject-433206")
+    dataset_id: str = Field(default="testdb_1")
+
+
+@functions_framework.http
+def create_bigquery_table(request) -> Dict[str, Any]:
+    try:
+        # Läsa JSON-data från förfrågan
+        data = RequestModel.parse_raw(request.get_data())
+    except ValueError as e:
+        return {"error": f"Invalid request payload: {e}"}, 400
+
+    table_name = data.table_name
+    table_type = data.table_type
+    project_id = data.project_id
+    dataset_id = data.dataset_id
 
     def get_secret(secret_name='bigquery-accout-secret') -> str:
         client = secretmanager.SecretManagerServiceClient()
-        project_id = 'tomastestproject-433206'
-        secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+        secret_path = f"projects/{project_id}/secrets/{
+            secret_name}/versions/latest"
         response = client.access_secret_version(name=secret_path)
         secret_data = response.payload.data.decode('UTF-8')
         return secret_data
@@ -72,7 +87,7 @@ def create_bigquery_table(request: BaseModel):
     else:
         return {"error": f"Invalid table_type '{table_type}'"}, 400
 
-    table_id = f"{data['project_id']}.{data['dataset_id']}.{table_name}"
+    table_id = f"{project_id}.{dataset_id}.{table_name}"
     table = bigquery.Table(table_id, schema=schema)
 
     try:
