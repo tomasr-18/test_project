@@ -1,24 +1,36 @@
+# steps:
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   entrypoint: 'gcloud'
+#   args:
+#     - 'functions'
+#     - 'deploy'
+#     - 'create_bigquery_table'
+#     - '--runtime'
+#     - 'python39'
+#     - '--trigger-http'
+#     - '--entry-point'
+#     - 'create_bigquery_table'
+#     - '--region'
+#     - 'europe-west1'
+#     - '--allow-unauthenticated'  # Om det är tillämpligt för din funktion
+
+# timeout: '600s'
+
+# options:  
+#   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+#   logging: CLOUD_LOGGING_ONLY
+
+# # Se till att serviceAccount är rätt stavat och har tillräckliga rättigheter
+# serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'gcloud'
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   args:
-    - 'functions'
-    - 'deploy'
-    - 'create_bigquery_table'
-    - '--runtime'
-    - 'python39'
-    - '--trigger-http'
-    - '--entry-point'
-    - 'create_bigquery_table'
-    - '--region'
-    - 'europe-west1'
-    - '--allow-unauthenticated'  # Om det är tillämpligt för din funktion
-
-timeout: '600s'
-
-options:  
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
-  logging: CLOUD_LOGGING_ONLY
-
-# Se till att serviceAccount är rätt stavat och har tillräckliga rättigheter
-serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+  - gcloud
+  - functions
+  - deploy
+  - create_bigquery_table
+  - --region=europe-west1
+  - --source=create_table
+  - --trigger-http
+  - --runtime=600s
