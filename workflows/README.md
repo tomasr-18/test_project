@@ -52,3 +52,13 @@ gcloud workflows deploy transfer-meta_data \
 
 
     gcloud workflows run transfer-meta_data --location=europe-west1 --project=tomastestproject-433206
+
+    --
+
+    gcloud workflows deploy test_bf \
+    --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/backfill_news.yaml\
+    --location=europe-west1 \
+    --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
+
+
+    

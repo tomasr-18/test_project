@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 import os
 from fetch_raw_data import fetch_news,save_raw_data_to_big_query
 from dotenv import load_dotenv
@@ -13,9 +13,8 @@ app = FastAPI()
 
 class QueryParameters(BaseModel):
     company: str
-    from_date: Optional[str] = (
-        datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-    to_date: Optional[str] = datetime.now().strftime('%Y-%m-%d')
+    from_date: Optional[str] = ((datetime.now(timezone.utc)) -timedelta(days=1)).strftime('%Y-%m-%d')
+    to_date: Optional[str] = ((datetime.now(timezone.utc)) - timedelta(days=1)).strftime('%Y-%m-%d')
     table_name: Optional[str] = 'raw_news'
 
 
@@ -41,7 +40,7 @@ def fetch_news_and_save(params: QueryParameters):
         
 
         # 3. Returnera framgångsmeddelande med hämtade data
-        return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults']}
+        return {"message": "Data fetched and saved successfully.", "Number of articels saved: ": news_data['totalResults'],"from_date":f"{params.from_date}","to_date":f"{params.to_date}","company":f"{params.company}"}
 
     except HTTPException as e:
         raise e
