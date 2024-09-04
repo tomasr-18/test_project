@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /transform_stocks
 
 # Copy the requirements file into the container
-COPY req.txt .
+COPY requirements.txt .
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
