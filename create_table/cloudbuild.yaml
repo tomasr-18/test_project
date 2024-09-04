@@ -18,7 +18,7 @@ steps:
 timeout: '600s'
 
 # Ange servicekontot som har rätt behörigheter
-serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+serviceAccount: 'projects/tomastestproject-433206/serviceAccounts/service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
 
 
 options:  
