@@ -16,7 +16,8 @@ steps:
     - 'europe-west1'
     - '--allow-unauthenticated'
     - '--service-account'
-    - 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+    - 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+      
 timeout: '600s'
 
 options:  
