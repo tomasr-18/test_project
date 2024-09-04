@@ -22,7 +22,7 @@ steps:
       'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
     ]
 
-  # Step 4: Deploy the Docker image to Cloud Run
+  # Step 4: Deploy the Docker image to Cloud Run.
   - name: 'gcr.io/cloud-builders/gcloud'
     args: [
       'run', 'deploy', 'fetch-stocks-raw-data-app', 
