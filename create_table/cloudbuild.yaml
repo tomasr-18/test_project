@@ -18,8 +18,8 @@ steps:
 timeout: '600s'
 
 # Ange servicekontot som har rätt behörigheter
-serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
-
+serviceAccount: service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com
+             
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
