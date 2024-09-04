@@ -5,7 +5,7 @@ steps:
       'build', 
       '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img', 
       '-f', 'transform_stocks/dockerfile', 
-      'transform-stocks'
+      'transform_stocks'
     ]
 
   # Step 2: Verify the Docker image is built
