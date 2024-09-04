@@ -2,23 +2,25 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'gcloud'
   env:
-    - 'GOOGLE_FUNCTION_SOURCE=create_table'  # Specifierar mappen där main.py finns
+    - 'GOOGLE_FUNCTION_SOURCE=create_table'
   args:
     - 'functions'
     - 'deploy'
-    - 'create_bigquery_table_2'  # Namnet på funktionen som ska deployas
+    - 'create_bigquery_table_2'
     - '--runtime'
     - 'python39'
     - '--trigger-http'
     - '--entry-point'
-    - 'create_bigquery_table_2'  # Namnet på din funktion i main.py
+    - 'create_bigquery_table_2'
     - '--region'
     - 'europe-west1'
     - '--allow-unauthenticated'
     - '--service-account'
     - 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
-      
+
 timeout: '600s'
+
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
