@@ -4,7 +4,7 @@ steps:
     args: [
       'build', 
       '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img', 
-      '-f', 'transform_stocks/dockerfile', 
+      '-f', 'transform_stocks/Dockerfile', 
       'transform_stocks'
     ]
 
@@ -19,7 +19,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push', 
-      'europe-west1-docker.pkg.dev/tomastestproject-433206/clean-stocks/clean-stocks-img'
+      'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img'
     ]
 
   # Step 4: Deploy the Docker image to Cloud Run
@@ -31,8 +31,9 @@ steps:
       '--region', 'europe-west1',
       '--allow-unauthenticated'
     ]
+
 images:
-  - 'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img'      
+  - 'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img' 
          
           
 options:  
