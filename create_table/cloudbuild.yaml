@@ -1,25 +1,24 @@
 steps:
-# Steg för att installera Google Cloud SDK
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'gcloud'
   args:
-  - 'functions'
-  - 'deploy'
-  - 'create_bigquery_table'  # Byt ut med namnet på din Cloud Function
-  - '--runtime'
-  - 'python39'
-  - '--trigger-http'
-  - '--entry-point'
-  - 'create_bigquery_table'  # Namnet på din ingångspunkt i main.py
-  - '--region'
-  - 'europe-west1'
-  - '--allow-unauthenticated'  # Om du vill att funktionen ska vara offentlig
+    - 'functions'
+    - 'deploy'
+    - 'create_bigquery_table'
+    - '--runtime'
+    - 'python39'
+    - '--trigger-http'
+    - '--entry-point'
+    - 'create_bigquery_table'
+    - '--region'
+    - 'europe-west1'
+    - '--allow-unauthenticated'
+    - '--service-account'
+    - 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
 
 timeout: '600s'
 
-# Ange servicekontot som har rätt behörigheter
-serviceAccount: service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com
-             
+serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
 
 options:  
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
