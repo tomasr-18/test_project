@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from google.cloud import secretmanager
 import uvicorn
 from typing import Dict
+from pydantic import BaseModel
 
 load_dotenv()
 # Load environment variables
