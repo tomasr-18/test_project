@@ -34,3 +34,10 @@ steps:
   - --source=create_table
   - --trigger-http
   - --runtime=600s
+
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+# Se till att serviceAccount är rätt stavat och har tillräckliga rättigheter
+serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
