@@ -4,7 +4,7 @@ steps:
     args: [
       'build', 
       '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/transform-stocks/transform-stocks-img', 
-      '-f', 'transform_stocks/Dockerfile', 
+      '-f', 'transform_stocks/dockerfile', 
       'transform_stocks'
     ]
 
