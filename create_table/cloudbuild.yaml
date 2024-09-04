@@ -13,3 +13,9 @@ steps:
   - '--region'
   - 'europe-west1'
 timeout: '600s'
+
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Replace with your actual Cloud Build service account
