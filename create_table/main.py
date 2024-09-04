@@ -16,7 +16,7 @@ class RequestModel(BaseModel):
 
 
 @functions_framework.http
-def create_bigquery_table(request) -> Dict[str, Any]:
+def create_bigquery_table_2(request) -> Dict[str, Any]:
     try:
         # Läsa JSON-data från förfrågan
         data = RequestModel.parse_raw(request.get_data())
