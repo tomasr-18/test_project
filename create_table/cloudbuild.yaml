@@ -1,0 +1,15 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'gcloud'
+  args:
+  - 'functions'
+  - 'deploy'
+  - 'create_bigquery_table'
+  - '--runtime'
+  - 'python39'
+  - '--trigger-http'
+  - '--entry-point'
+  - 'create_bigquery_table'
+  - '--region'
+  - 'europe-west1'
+timeout: '600s'
