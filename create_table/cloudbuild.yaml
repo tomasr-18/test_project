@@ -14,9 +14,9 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'create-bigquery-table_2'
+      - 'create-bigquery-table-2'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/create-bigquery-table'
+      - 'gcr.io/$PROJECT_ID/create-bigquery-table-2'
       - '--platform'
       - 'managed'
       - '--region'
