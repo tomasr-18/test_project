@@ -1,22 +1,31 @@
 steps:
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: 'gcloud'
-  env:
-    - 'GOOGLE_FUNCTION_SOURCE=create_table'
-  args:
-    - 'functions'
-    - 'deploy'
-    - 'create_bigquery_table_2'
-    - '--runtime'
-    - 'python39'
-    - '--trigger-http'
-    - '--entry-point'
-    - 'create_bigquery_table_2'
-    - '--region'
-    - 'europe-west1'
-    - '--allow-unauthenticated'
+  # Steg för att bygga Docker-avbildningen
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/create-bigquery-table'
+      - '.'
+    dir: 'create_table'  # Mappen där Dockerfile ligger (se nedan)
+
+  # Steg för att distribuera till Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'create-bigquery-table_2'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/create-bigquery-table'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'europe-west1'
+      - '--allow-unauthenticated'
+    dir: 'create_table'  # Mappen där Dockerfile ligger (se nedan)
 
 timeout: '600s'
+
 
 serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
 
