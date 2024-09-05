@@ -16,3 +16,7 @@ test.ipynb
 
 
 
+
+/ml_model/ml-model
+/ml_model/credentials
+/ml_model/.env
