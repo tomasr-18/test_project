@@ -1,3 +1,7 @@
 river
 google-cloud-bigquery
 google-cloud-storage
+scikit-learn
+pandas
+dotenv
+joblib

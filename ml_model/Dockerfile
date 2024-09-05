@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run train_model.py when the container launches
-CMD ["python", "train_model.py"]
+CMD ["python", "model_machine.py"]
