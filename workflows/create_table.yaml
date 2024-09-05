@@ -1,0 +1,44 @@
+    # table_name: str
+    # table_type: str
+    # project_id: str = Field(default="tomastestproject-433206")
+    # dataset_id: str = Field(default="testdb_1")
+main:
+  params: [event]
+  steps:
+    - init_vars:
+        assign:
+          - table_name: ""
+          - table_type: ""
+          - project_id: "tomastestproject-433206"
+          - dataset_id: "testdb_1"
+
+    - decode_input:  # Assign incoming message directly   
+        assign:
+          - table_name: ${event.table_name}
+          - table_type: ${event.table_type}
+          - project_id: ${event.project_id}
+          - dataset_id: ${event.dataset_id}
+
+    - call_service:
+        call: http.post
+        args:
+          url: "https://europe-west1-tomastestproject-433206.cloudfunctions.net/create_bigquery_table/"
+          auth:
+            type: OIDC  # Use OpenID Connect for authentication
+          body:
+            table_name: ${table_name}
+            table_type: ${table_type}
+            project_id: ${project_id}
+            dataset_id: ${dataset_id}
+          headers:
+            Content-Type: "application/json"
+        result: service_response
+
+    - finish_workflow:   # End of Workflow and return the declared variables
+        return:
+          - ${event}
+          - ${service_response}
+
+
+          
+

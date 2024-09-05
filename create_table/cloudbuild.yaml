@@ -13,7 +13,7 @@ steps:
   - 'create_bigquery_table'
   - '--region'
   - 'europe-west1'
-  - '--allow-unauthenticated'
+ # - '--allow-unauthenticated'
   - '--source'
   - 'create_table'  # Här pekar vi på mappen där din kod ligger
   - '--service-account'
