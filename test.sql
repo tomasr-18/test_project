@@ -49,7 +49,7 @@ avg_scores AS (
 unique_stocks AS (
   SELECT 
     stock_symbol, 
-    DATE(date) AS date, 
+    date,  -- Använd original date-kolumnen utan omvandling
     open, 
     high, 
     low, 
@@ -58,7 +58,7 @@ unique_stocks AS (
   FROM (
     SELECT 
       *, 
-      ROW_NUMBER() OVER (PARTITION BY stock_symbol, DATE(date)) AS row_num
+      ROW_NUMBER() OVER (PARTITION BY stock_symbol, date) AS row_num
     FROM 
       `tomastestproject-433206.testdb_1.clean_stock_data`
   )
@@ -69,17 +69,19 @@ unique_stocks AS (
 SELECT 
   a.avg_score_description, 
   a.avg_score_title, 
-  a.company, 
-  a.pub_date, 
+  b.stock_symbol AS company,  -- Matcha företaget från aktiedata
+  b.date AS pub_date,         -- Matcha datum från aktiedata
   b.open, 
   b.high, 
   b.low, 
   b.close, 
   b.volume
 FROM 
-  avg_scores a
-JOIN 
   unique_stocks b
+RIGHT JOIN 
+  avg_scores a
 ON 
   a.company = b.stock_symbol
-  AND a.pub_date = b.date;
+  AND a.pub_date = b.date
+ORDER BY 
+  b.date DESC;

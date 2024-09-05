@@ -87,8 +87,7 @@ def get_data_by_company(company: list[str],
     return df
 
 
-
-def calculate_rolling_average(df:pd.DataFrame, column_name:str, window_size=5)->pd.DataFrame:
+def calculate_rolling_average(df: pd.DataFrame, column_name: str, window_size=5) -> pd.DataFrame:
     """
     Calculates a rolling average over the last n days for a specified column.
 
@@ -109,4 +108,50 @@ def calculate_rolling_average(df:pd.DataFrame, column_name:str, window_size=5)->
     df[f'rolling_avg_{column_name}'] = df[column_name].rolling(
         window=window_size).mean()
 
+    df[f'rolling_avg_{column_name}'] = df[f'rolling_avg_{column_name}'].fillna(df[column_name])
     return df
+
+
+def transform_data_to_model(df: pd.DataFrame, from_date="2024-08-02"):
+    """
+    Transforms the input DataFrame by adding a target column, filtering by date, and filling missing values.
+
+    This function performs the following steps:
+    1. Converts the 'pub_date' column to a datetime format.
+    2. Filters the DataFrame to include only rows where 'pub_date' is on or after the specified `from_date`.
+    3. Adds a 'target' column to the DataFrame, where the target value is the 'close' price of the next day for each 'company'.
+       If the next day's value is not available, the current day's 'close' price is used instead.
+    4. Fills any remaining missing values in the DataFrame with zero.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing stock and news data. It must have the following columns:
+                       - 'company' (STRING): The stock symbol.
+                       - 'pub_date' (STRING or DATETIME): The publication date of the record.
+                       - 'close' (FLOAT): The closing price of the stock.
+    from_date (str, optional): The start date for filtering the DataFrame. Default is "2024-08-02". The date should be in 'YYYY-MM-DD' format.
+
+    Returns:
+    pd.DataFrame: The transformed DataFrame with the following changes:
+                  - 'pub_date' column converted to datetime format.
+                  - Rows filtered to include only those with 'pub_date' on or after `from_date`.
+                  - A new 'target' column added, representing the 'close' price of the next day or the current day's 'close' price if the next day's value is missing.
+                  - Any remaining missing values filled with zero."""
+    def add_target_column(df):
+        # Sortera efter symbol och date för korrekt ordning
+        df = df.sort_values(by=['company', 'pub_date'])
+
+        # Skapa target-kolumn genom att shifta 'close' värdet för nästa datum per symbol
+        df['target'] = df.groupby('company')['close'].shift(-1)
+        df['target'] = df['target'].fillna(df['close'])
+        return df
+
+    df['pub_date'] = pd.to_datetime(df['pub_date'])
+    df_right_dates = df[df["pub_date"] >= from_date]
+
+    df_with_target = add_target_column(df=df_right_dates)
+
+    df_with_target.fillna(0, inplace=True)
+
+    return df_with_target
+
+
