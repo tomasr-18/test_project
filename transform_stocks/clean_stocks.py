@@ -1,56 +1,56 @@
 import os
-import sys
-import time
 import json
-from datetime import datetime
-import requests
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
 from google.cloud import bigquery
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 from google.cloud import secretmanager
-import structlog
+import uvicorn
 
-# Initialize structured logging
-logger = structlog.get_logger()
+load_dotenv()
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
-    """Fetches a secret from Google Cloud Secret Manager."""
-    try:
-        client = secretmanager.SecretManagerServiceClient()
-        project_id = 'tomastestproject-433206' 
-        secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
-        response = client.access_secret_version(name=secret_path)
-        secret_data = response.payload.data.decode('UTF-8')
-        return secret_data
-    except Exception as e:
-        logger.exception("Error fetching secret from Secret Manager", exc_info=True)
-        raise 
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
+    client = secretmanager.SecretManagerServiceClient()
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
+    response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
+    secret_data = response.payload.data.decode('UTF-8')
+
+    return secret_data
 
 # Load environment variables
-STOCK_API_KEY = os.getenv('STOCK_API_KEY') or get_secret('stock-api-key')
-PROJECT_ID = os.environ.get('PROJECT_ID') or get_secret('project-id')
-RAW_DATA_TABLE_ID = os.getenv('RAW_DATA_TABLE_ID') or get_secret('raw-data-table-id')
-CLEANED_DATA_TABLE_ID = os.getenv('CLEANED_DATA_TABLE_ID') or get_secret('clean-stock-data-table-id')
+STOCK_API_KEY = os.getenv('STOCK_API_KEY') 
+PROJECT_ID = os.environ.get('PROJECT_ID') 
+RAW_DATA_TABLE_ID = os.getenv('RAW_DATA_TABLE_ID') 
+CLEANED_DATA_TABLE_ID = os.getenv('CLEANED_DATA_TABLE_ID')
 
-# Initialize BigQuery client
-credentials = service_account.Credentials.from_service_account_info(json.loads(get_secret('bigquery-accout-secret')))
-client = bigquery.Client(credentials=credentials, project=PROJECT_ID)
-
-# Initialize FastAPI app
 app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Stock Data API"}
-
 @app.post("/clean-stock-data/")
 def clean_stock_data():
     """
     Fetches raw stock data from BigQuery, cleans it, and inserts the cleaned data back into BigQuery.
     """
+    secret_data = get_secret()
+
+    service_account_info = json.loads(secret_data)
+
+    # Initiera BigQuery-klienten med service account
+    client = bigquery.Client.from_service_account_info(service_account_info)
+
     try:
         ## Query to fetch raw data from BigQuery
         query = f"""
@@ -63,7 +63,7 @@ def clean_stock_data():
         rows_to_insert = []
         for row in results:
             stock_symbol = row.stock_symbol
-            raw_data_str = json.loads(row.raw_data)  # Parse the JSON string
+            raw_data_str = row.raw_data  # Parse the JSON string
             
             # Parse the JSON-like structure of raw_data_str
             time_series = raw_data_str.get("Time Series (Daily)", {})
@@ -92,3 +92,5 @@ def clean_stock_data():
         print(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)

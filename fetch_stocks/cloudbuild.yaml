@@ -1,0 +1,42 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build', 
+      '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img', 
+      '-f', 'fetch_stocks/dockerfile',  # Correct path to the Dockerfile
+      'fetch_stocks'  # Context directory
+    ]
+
+  # Step 2: Verify the Docker image is built
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'images', 
+      'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
+    ]
+
+  # Step 3: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push', 
+      'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
+    ]
+
+  # Step 4: Deploy the Docker image to Cloud Run.
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'run', 'deploy', 'fetch-stocks-raw-data-app', 
+      '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img',
+      '--platform', 'managed',
+      '--region', 'europe-west1',
+      '--allow-unauthenticated'
+    ]
+
+images:
+  - 'europe-west1-docker.pkg.dev/tomastestproject-433206/fetch-stocks/fetch-stocks-raw-data-img'
+
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Replace with your actual Cloud Build service account

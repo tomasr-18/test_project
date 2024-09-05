@@ -1,0 +1,115 @@
+main:
+  steps:
+    - fetch_stock_data_AAPL:
+        try:
+          steps:
+            - try_call_AAPL:
+                call: http.post
+                args:
+                  url: https://fetch-stocks-raw-data-app-839243415895.europe-west1.run.app/raw-stock-data/
+                  auth:
+                    type: OIDC
+                  headers:
+                    Content-Type: application/json
+                  body:
+                    stock_symbol: AAPL
+                result: service_response_AAPL
+        except:
+          as: error_AAPL
+          steps:
+            - handle_error_AAPL:
+                assign:
+                  - service_response_AAPL: {"body": "Failed to fetch stocks for AAPL"}
+
+    - fetch_stock_data_GOOGL:
+        try:
+          steps:
+            - try_call_GOOGL:
+                call: http.post
+                args:
+                  url: https://fetch-stocks-raw-data-app-839243415895.europe-west1.run.app/raw-stock-data/
+                  auth:
+                    type: OIDC
+                  headers:
+                    Content-Type: application/json
+                  body:
+                    stock_symbol: GOOGL
+                result: service_response_GOOGL
+        except:
+          as: error_GOOGL
+          steps:
+            - handle_error_GOOGL:
+                assign:
+                  - service_response_GOOGL: {"body": "Failed to fetch stocks for GOOGL"}
+
+    - fetch_stock_data_MSFT:
+        try:
+          steps:
+            - try_call_MSFT:
+                call: http.post
+                args:
+                  url: https://fetch-stocks-raw-data-app-839243415895.europe-west1.run.app/raw-stock-data/
+                  auth:
+                    type: OIDC
+                  headers:
+                    Content-Type: application/json
+                  body:
+                    stock_symbol: MSFT
+                result: service_response_MSFT
+        except:
+          as: error_MSFT
+          steps:
+            - handle_error_MSFT:
+                assign:
+                  - service_response_MSFT: {"body": "Failed to fetch stocks for MSFT"}
+
+    - fetch_stock_data_AMZN:
+        try:
+          steps:
+            - try_call_AMZN:
+                call: http.post
+                args:
+                  url: https://fetch-stocks-raw-data-app-839243415895.europe-west1.run.app/raw-stock-data/
+                  auth:
+                    type: OIDC
+                  headers:
+                    Content-Type: application/json
+                  body:
+                    stock_symbol: AMZN
+                result: service_response_AMZN
+        except:
+          as: error_AMZN
+          steps:
+            - handle_error_AMZN:
+                assign:
+                  - service_response_AMZN: {"body": "Failed to fetch stocks for AMZN"}
+
+    - fetch_stock_data_TSLA:
+        try:
+          steps:
+            - try_call_TSLA:
+                call: http.post
+                args:
+                  url: https://fetch-stocks-raw-data-app-839243415895.europe-west1.run.app/raw-stock-data/
+                  auth:
+                    type: OIDC
+                  headers:
+                    Content-Type: application/json
+                  body:
+                    stock_symbol: TSLA
+                result: service_response_TSLA
+        except:
+          as: error_TSLA
+          steps:
+            - handle_error_TSLA:
+                assign:
+                  - service_response_TSLA: {"body": "Failed to fetch stocks for TSLA"}
+
+    - return_result:
+        return:
+        - ${service_response_AAPL}
+        - ${service_response_GOOGL}
+        - ${service_response_MSFT}
+        - ${service_response_AMZN}
+        - ${service_response_TSLA}
+
