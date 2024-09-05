@@ -1,8 +1,8 @@
-from pipline_to_ml import get_data_by_company, calculate_rolling_average,transform_data_to_model
-from fastapi import FastAPI, HTTPException
+#from pipline_to_ml import get_data_by_company, calculate_rolling_average,transform_data_to_model
+from fastapi import FastAPI#, HTTPException
 from pydantic import BaseModel
 from typing import Optional , List
-import logging
+#import logging
 
 app = FastAPI()
 

@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from google.cloud import storage
-from google.cloud import bigquery
+#from google.cloud import bigquery
 import pandas as pd
 from sklearn.linear_model import SGDRegressor
 from sklearn.preprocessing import StandardScaler
@@ -42,7 +42,7 @@ def load_model():
         with open(model_file, 'rb') as f:
             model = joblib.load(f)
         print(f"Model {model_name} loaded successfully.")
-    except Exception as e:
+    except Exception:
         print(f"Model {model_name} not found. Initializing a new model.")
         model = make_pipeline(StandardScaler(), SGDRegressor())
     return model
