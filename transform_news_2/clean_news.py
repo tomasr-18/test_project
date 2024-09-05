@@ -173,45 +173,6 @@ def clean_news(df: pd.DataFrame) -> pd.DataFrame:
 
     return final_df
 
-# def clean_news(df: pd.DataFrame) -> pd.DataFrame:
-#     """
-#         Cleans and transforms raw news data extracted from BigQuery into a structured DataFrame format.
-
-#     This function takes a DataFrame containing raw news data, unpacks JSON-like structures to separate rows 
-#     for each news article, and normalizes the data into a flat table format. The resulting DataFrame will have 
-#     one row per article with relevant information such as author, description, publication date, title, URL, 
-#     source, company, and sentiment scores.
-
-#     """
-#     # Förbered DataFrame
-#     # Se till att 'data' kolumnen är en lista av artiklar
-#     df.drop(columns=['unique_id'], inplace=True)
-
-#     df['data'] = df['data'].apply(lambda x: x.get(
-#         'articles', []) if isinstance(x, dict) else [])
-
-#     # Explodera artiklar till separata rader
-#     df_exploded = df.explode('data')
-
-#     # Normalisera JSON-data i 'data' kolumnen
-#     articles_df = pd.json_normalize(df_exploded['data'])
-
-#     # Lägg till övriga kolumner
-#     # Kombinera normaliserad artikeldata med 'company' kolumnen
-#     final_df = pd.concat(
-#         [articles_df, df_exploded[['company']].reset_index(drop=True)], axis=1)
-
-#     final_df.drop(columns=['content', 'source.id', 'urlToImage'], inplace=True)
-
-#     final_df['publishedAt'] = pd.to_datetime(
-#         final_df['publishedAt'], format='%Y-%m-%dT%H:%M:%SZ', utc=True)
-
-#     final_df.rename(columns={"source.name": "source_name",
-#                              "publishedAt": "pub_date"},
-#                     inplace=True
-#                     )
-#     return final_df
-
 
 def make_sentiment_score(string: str) -> float:
     """
