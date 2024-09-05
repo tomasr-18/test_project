@@ -4,7 +4,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/create-bigquery-table'
+      - 'gcr.io/$PROJECT_ID/create-bigquery-table-2'
       - '.'
     dir: 'create_table'  # Mappen där Dockerfile ligger (se nedan)
 

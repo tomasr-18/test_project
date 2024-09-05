@@ -16,7 +16,7 @@ class RequestModel(BaseModel):
 
 
 @functions_framework.http
-def create_bigquery_table_2(request) -> Dict[str, Any]:
+def create_bigquery_table(request) -> Dict[str, Any]:
     try:
         # Läsa JSON-data från förfrågan
         data = RequestModel.parse_raw(request.get_data())
@@ -30,7 +30,8 @@ def create_bigquery_table_2(request) -> Dict[str, Any]:
 
     def get_secret(secret_name='bigquery-accout-secret') -> str:
         client = secretmanager.SecretManagerServiceClient()
-        secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+        secret_path = f"projects/{project_id}/secrets/{
+            secret_name}/versions/latest"
         response = client.access_secret_version(name=secret_path)
         secret_data = response.payload.data.decode('UTF-8')
         return secret_data
