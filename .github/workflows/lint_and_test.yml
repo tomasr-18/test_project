@@ -1,0 +1,41 @@
+name: Lint and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install ruff
+
+    - name: Run Ruff Linting
+      run: |
+        ruff check . --config pyproject.toml
+
+    - name: Run Tests
+      run: |
+        # Check if there are any test files before running pytest
+        if ls **/test_*.py 1> /dev/null 2>&1; then
+          echo "Test files found, running pytest..."
+          pytest
+        else
+          echo "No test files found, skipping tests."
+        fi

@@ -2,7 +2,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
 from typing import Optional
-from google.cloud import bigquery
 from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data
 import logging
 
@@ -70,13 +69,13 @@ def clean_news_endpoint(request: NewsRequest):
 @app.post("/transfer_to_meta_data/")
 def transfer_to_meta_data_endpoint(request:TransferData):
     try:
-        transfer_ids_to_meta_data(
+        rows_inserted = transfer_ids_to_meta_data(
                                 table_from=request.table_from,
                                 table_to=request.table_to,
                                 project_id=request.project_id,
                                 dataset=request.dataset
                                 )
-
+        return {"messege": f"{rows_inserted} rows inserted to {request.table_to}"}
     except Exception as e:
             # Logga detaljer om felet och returnera ett HTTP-fel med detaljer
             logging.error(f"Error occurred: {e}")

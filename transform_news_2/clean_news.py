@@ -121,7 +121,7 @@ def update_is_processed(id_string: str,
     # Kör frågan
     job = client.query(query)
     job.result()  # Vänta på att jobbet ska slutföras
-    print(f'raderna {id_string} har ändrats')
+    return id_string
 
 
 def clean_news(df: pd.DataFrame) -> pd.DataFrame:
@@ -299,6 +299,12 @@ def transfer_ids_to_meta_data(table_from='raw_news_data',
         # Infoga data till BigQuery
         errors = client.query(query)
 
+        # Wait for the job to complete
+        result = errors.result()
+
+        # Retrieve the number of rows affected by the query
+        rows_inserted = result.num_dml_affected_rows
+        return rows_inserted
     except NotFound:
         print(f"Error: The table {meta_data_table} was not found.")
         raise
