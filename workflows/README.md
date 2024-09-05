@@ -74,10 +74,16 @@ gcloud workflows deploy transfer-meta_data \
 
     --
 
-    gcloud workflows deploy test_bf \
+    gcloud workflows deploy backfill_news \
     --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/backfill_news.yaml\
     --location=europe-west1 \
     --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
 
 
+    --
+
+      gcloud workflows deploy create_table_in_big_query \
+    --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/create_table.yaml\
+    --location=europe-west1 \
+    --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
     
