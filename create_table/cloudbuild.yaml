@@ -1,34 +1,26 @@
 steps:
-  # Steg för att bygga Docker-avbildningen
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '-t'
-      - 'gcr.io/$PROJECT_ID/create-bigquery-table-2'
-      - '.'
-    dir: 'create_table'  # Mappen där Dockerfile ligger (se nedan)
-
-  # Steg för att distribuera till Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
-    args:
-      - 'run'
-      - 'deploy'
-      - 'create-bigquery-table-2'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/create-bigquery-table-2'
-      - '--platform'
-      - 'managed'
-      - '--region'
-      - 'europe-west1'
-      - '--allow-unauthenticated'
-    dir: 'create_table'  # Mappen där Dockerfile ligger (se nedan)
+# Steg för att installera Google Cloud SDK och distribuera Cloud Function
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args:
+  - 'functions'
+  - 'deploy'
+  - 'create_bigquery_table'
+  - '--runtime'
+  - 'python39'
+  - '--trigger-http'
+  - '--entry-point'
+  - 'create_bigquery_table'
+  - '--region'
+  - 'europe-west1'
+  - '--allow-unauthenticated'
+  - '--source'
+  - 'create_table'  # Här pekar vi på mappen där din kod ligger
+  - '--service-account'
+  - 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'  # Ange din servicekonto
 
 timeout: '600s'
 
-
-serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
-
-options:  
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+# Valfria inställningar
+options:
   logging: CLOUD_LOGGING_ONLY
