@@ -177,3 +177,10 @@ def save_predictions_to_big_query(data: pd.DataFrame,
         raise Exception("Failed to decode service account info from secret.")
     except Exception as e:
         raise Exception(f"Failed to save predictions to BigQuery: {e}")
+
+if __name__=="__main__":
+    df = get_data_by_company(['AAPL', 'GOOGL', 'TSLA', 'AMZN',
+                              'MSFT'], table="avg_scores_and_stock_data_right")
+    asd = transform_data_to_model(df)
+    #df_rolling_avg = calculate_rolling_average(df=asd, column_name="close", window_size=3)
+    print(asd.shape)
