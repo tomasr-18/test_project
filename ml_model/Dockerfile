@@ -1,14 +1,23 @@
-# Use an official Python runtime as a parent image
+# Använd en officiell Python-bild som bas
 FROM python:3.9-slim
 
-# Set the working directory
-WORKDIR /app
+# Ställ in arbetskatalogen i containern
+WORKDIR /transform_news_ny
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Kopiera requirements.txt till arbetskatalogen
+COPY req.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Installera Python-biblioteken som behövs
+RUN pip install --no-cache-dir -r req.txt
 
-# Run train_model.py when the container launches
-CMD ["python", "model_machine.py"]
+# Kopiera all kod till containern
+COPY . .
+
+# Exponera port 8080
+EXPOSE 8080
+
+# Kör load_env.py för att ladda miljövariabler
+RUN python load_env.py
+
+# Starta Flask-applikationen
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
