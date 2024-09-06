@@ -2,10 +2,10 @@
 FROM python:3.9-slim
 
 # Ställ in arbetskatalogen i containern
-WORKDIR /transform_news_ny
+WORKDIR /app
 
 # Kopiera requirements.txt till arbetskatalogen
-COPY req.txt .
+COPY requirements.txt .
 
 # Installera Python-biblioteken som behövs
 RUN pip install --no-cache-dir -r req.txt
