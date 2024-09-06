@@ -1,4 +1,4 @@
-#from pipline_to_ml import get_data_by_company, calculate_rolling_average,transform_data_to_model
+from pipline_to_ml import get_data_by_company, calculate_rolling_average, transform_data_to_model,train_model#,scale_features
 from fastapi import FastAPI#, HTTPException
 from pydantic import BaseModel
 from typing import Optional , List
@@ -15,6 +15,7 @@ class ModelRequest(BaseModel):
     dataset: Optional[str] = 'testdb_1'
     table_from: Optional[str] = 'avg_scores_and_stock_data_right'
     prediction_table: Optional[str] = 'model_predictions'
+    #model_name = Optional[str] = "latest"
 
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
@@ -22,7 +23,13 @@ class ModelRequest(BaseModel):
 
 @app.post("/train_model/")
 def train_model_endpoint(request: ModelRequest):
-    pass
+    df=get_data_by_company(company=request.company_list)
+    transformed_df=transform_data_to_model(df=df)
+    transformed_rolling_avg = calculate_rolling_average(df=transformed_df,column_name="close",window_size=3)
+    models = train_model(df=transformed_rolling_avg)
+    return models
+    
+    
 
 
 @app.post("/predict/")

@@ -47,7 +47,7 @@ def load_model():
         model = make_pipeline(StandardScaler(), SGDRegressor())
     return model
 
-def save_model(model):
+def save_model(model,model_name):
     model_name = 'stock_model_2.pkl'
     model_file = f'{model_name}'
     with open(model_file, 'wb') as f:
@@ -57,7 +57,7 @@ def save_model(model):
     print(f"Model {model_name} saved successfully.")
 
 # Define the model training function
-def train_model():
+def train_model(df:pd.DataFrame,):
     data = pd.read_csv('./data/data.csv') 
     X = data[['Open', 'High', 'Low', 'Volume']]  # Replace with actual feature columns
     y = data['Close']  # Replace with actual target column
@@ -88,6 +88,7 @@ def upload_to_bucket(model_path: str):
     blob.upload_from_filename(local_file_path)
 
     print(f"File '{local_file_path}' uploaded to '{destination_blob_name}' in the bucket.")
+
 
 if __name__ == '__main__':
 

@@ -5,10 +5,6 @@ from google.cloud import secretmanager
 from google.api_core.exceptions import GoogleAPICallError, NotFound, BadRequest
 from typing import List
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.linear_model import LinearRegression
 
 
