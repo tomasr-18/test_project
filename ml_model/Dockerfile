@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Installera Python-biblioteken som behövs
-RUN pip install --no-cache-dir -r req.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Kopiera all kod till containern
 COPY . .
