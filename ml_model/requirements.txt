@@ -5,3 +5,8 @@ scikit-learn
 pandas
 dotenv
 joblib
+google-cloud-secret-manager
+requests
+python-dotenv
+fastapi
+uvicorn
