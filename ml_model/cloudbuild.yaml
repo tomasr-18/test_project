@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'        
   args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/ml-model/model-img']
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['run', 'deploy', 'clean-news-app-ny', 
+  args: ['run', 'deploy', 'ml-model', 
           '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/ml-model/model-img',
           '--platform', 'managed',
           '--region', 'europe-west1']
