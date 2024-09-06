@@ -4,6 +4,12 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 from google.api_core.exceptions import GoogleAPICallError, NotFound, BadRequest
 from typing import List
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.linear_model import LinearRegression
 
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
@@ -121,20 +127,38 @@ def transform_data_to_model(df: pd.DataFrame, from_date="2024-08-02") -> pd.Data
     :return: Transformed DataFrame with added target column, filtered rows, and filled missing values.
     """
     try:
+        # Konvertera 'pub_date' till datetime och hantera fel
         df['pub_date'] = pd.to_datetime(df['pub_date'], errors='coerce')
         if df['pub_date'].isnull().any():
             raise ValueError("Invalid date format in 'pub_date' column.")
 
+        # Filtrera DataFrame baserat på 'from_date'
         df_right_dates = df[df["pub_date"] >= from_date]
 
-        def add_target_column(df: pd.DataFrame):
+        def add_target_column(df: pd.DataFrame) -> pd.DataFrame:
+            # Sortera DataFrame efter 'company' och 'pub_date'
             df = df.sort_values(by=['company', 'pub_date'])
+
+            # Skapa 'target'-kolumn genom att skifta 'close' värdet för nästa datum per 'company'
             df['target'] = df.groupby('company')['close'].shift(-1)
-            df['target'] = df['target'].fillna(df['close'])
+
+            # Fyll endast NaN i den första raden i varje grupp (inte den sista)
+            def fill_first_na(group: pd.DataFrame) -> pd.DataFrame:
+                if pd.isna(group['target'].iloc[0]):
+                    group.loc[group.index[0],
+                              'target'] = group['close'].iloc[0]
+                return group
+
+            # Använd funktionen på varje grupp och återställ indexet
+            df = df.groupby('company').apply(
+                fill_first_na).reset_index(drop=True)
             return df
 
         df_with_target = add_target_column(df=df_right_dates)
-        df_with_target.fillna(0, inplace=True)
+
+        # Fyll NaN i specifika kolumner
+        df_with_target[['avg_score_description', 'avg_score_title']] = df_with_target[[
+            'avg_score_description', 'avg_score_title']].fillna(0)
 
         return df_with_target
 
@@ -143,15 +167,20 @@ def transform_data_to_model(df: pd.DataFrame, from_date="2024-08-02") -> pd.Data
     except Exception as e:
         raise Exception(f"Failed to transform data to model format: {e}")
 
+    except KeyError as e:
+        raise Exception(f"Missing expected column in DataFrame: {e}")
+    except Exception as e:
+        raise Exception(f"Failed to transform data to model format: {e}")
 
-def save_predictions_to_big_query(data: pd.DataFrame,
+
+def save_predictions_to_big_query(data: list,
                                   project_id='tomastestproject-433206',
                                   dataset='testdb_1',
-                                  table="predictions"):
+                                  table='predictions'):
     """
-    Saves a DataFrame to a specified BigQuery table.
+    Saves a list of dictionaries to a specified BigQuery table.
 
-    :param data: DataFrame containing the data to be saved.
+    :param data: List of dictionaries containing the data to be saved.
     :param project_id: Google Cloud project ID where the BigQuery dataset is located.
     :param dataset: BigQuery dataset name.
     :param table: BigQuery table name.
@@ -163,13 +192,14 @@ def save_predictions_to_big_query(data: pd.DataFrame,
             service_account_info)
 
         table_id = f"{project_id}.{dataset}.{table}"
-        job = client.load_table_from_dataframe(data, table_id)
-        job.result()  # Wait for the job to complete
 
-        if job.errors:
-            raise Exception(f"Errors during BigQuery load: {job.errors}")
+        # Insert rows into BigQuery
+        errors = client.insert_rows_json(table_id, data)
+
+        if errors:
+            raise Exception(f"Errors during BigQuery load: {errors}")
         else:
-            return (f'{job.output_rows} rows saved to {table_id}')
+            return f'{len(data)} rows saved to {table_id}'
 
     except GoogleAPICallError as e:
         raise Exception(f"BigQuery API call failed: {e}")
@@ -178,9 +208,79 @@ def save_predictions_to_big_query(data: pd.DataFrame,
     except Exception as e:
         raise Exception(f"Failed to save predictions to BigQuery: {e}")
 
-if __name__=="__main__":
-    df = get_data_by_company(['AAPL', 'GOOGL', 'TSLA', 'AMZN',
-                              'MSFT'], table="avg_scores_and_stock_data_right")
-    asd = transform_data_to_model(df)
-    #df_rolling_avg = calculate_rolling_average(df=asd, column_name="close", window_size=3)
-    print(asd.shape)
+
+def train_model(df: pd.DataFrame, company_list=['AAPL', 'GOOGL', 'TSLA', 'AMZN', 'MSFT']) -> dict:
+    model_dict = {}
+    prediction_rows = {}
+    for company in company_list:
+
+        company_df = df[df["company"] == company]
+        company_df_sorted = company_df.sort_values(by="pub_date")
+
+        date = company_df_sorted["pub_date"].tail(1)
+
+        y = company_df_sorted['target']
+        X = company_df_sorted.drop(columns=["company", "target", "pub_date"])
+
+        X_scaled = scale_features(df=X)
+
+        prediction_row = X_scaled.tail(1)
+        prediction_rows[f'{company}'] = prediction_row
+
+        X_train = X_scaled.iloc[:-1]
+        y_train = y.iloc[:-1]
+
+        model = LinearRegression()
+        model.fit(X_train, y_train)
+        model_dict[f'{company}_model'] = model
+
+    return model_dict, prediction_rows, date.iloc[0].strftime('%Y-%m-%dT%H:%M:%S')
+
+
+def scale_features(df: pd.DataFrame, features_to_scale=['open',	'high',	'low', 'close', 'volume', 'rolling_avg_close']) -> pd.DataFrame:
+    """
+    Skalar endast de angivna features i DataFrame.
+
+    :param x_df: DataFrame med alla features
+    :param features_to_scale: Lista med kolumnnamn som ska skalas
+    :return: DataFrame med skalade och icke-skalade features
+    """
+    # Skapa en kopia av DataFrame för att undvika att ändra originaldatan
+    df_scaled = df.copy()
+
+    # Initiera skalaren
+    scaler = StandardScaler()
+
+    # Skala endast de specifika kolumnerna
+    df_scaled[features_to_scale] = scaler.fit_transform(
+        df[features_to_scale])
+
+    return df_scaled
+
+
+def make_prediction(models_dict: dict, x_pred: dict) -> dict:
+    predictions_by_company = {}
+    for model, prediction_row in zip(models_dict.items(), x_pred.items()):
+        reg_model = model[1]
+        company = prediction_row[0]
+        df = prediction_row[1]
+        pred = reg_model.predict(df)
+        predictions_by_company[company] = pred
+    return predictions_by_company
+
+
+def transform_predictions_for_bq(predictions: dict, date: str) -> list:
+    to_bq = [
+        {
+            "company": company,
+            # Vi antar att värdet alltid är en array med ett element
+            "predicted_value": float(value[0]),
+            "date": date
+        }
+        for company, value in predictions.items()
+    ]
+    return to_bq
+
+
+def save_models():
+    pass
