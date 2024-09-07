@@ -18,7 +18,7 @@ EXPOSE 8080
 
 # Kör load_env.py för att ladda miljövariabler
 # Kör både load_env.py och starta appen när containern startas
-#CMD ["bash", "-c", "python load_env.py && uvicorn main:app --host 0.0.0.0 --port 8080"]
+CMD ["bash", "-c", "python load_env.py && uvicorn main:app --host 0.0.0.0 --port 8080"]
 
 # Starta Flask-applikationen
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

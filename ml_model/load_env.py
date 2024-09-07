@@ -19,7 +19,7 @@ def load_env_from_secret(secret_name, project_id):
         os.environ[key] = value
 
 
-# Använd funktionen för att ladda .env från Secret Manager
+# Använd funktionen för att ladda .env från Secret Manager  
 load_env_from_secret('my-env-file', 'tomastestproject-433206')
 
 
