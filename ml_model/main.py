@@ -41,6 +41,7 @@ def predict_endpoint(request: ModelRequest):
     from_date="2024-09-01"
     to_date="2024-09-05"
     sort_by="relevance"
+    language="en"
     url = f'https://newsapi.org/v2/everything?q={company}&from={from_date}&to={to_date}&sortBy={sort_by}&language={language}&apiKey={asd}'
 
     import requests
