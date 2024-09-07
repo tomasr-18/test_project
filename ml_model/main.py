@@ -3,8 +3,9 @@ from fastapi import FastAPI#, HTTPException
 from pydantic import BaseModel
 from typing import Optional , List
 import os
+from dotenv import load_dotenv
 #import logging
-
+load_dotenv()
 app = FastAPI()
 
 # Definiera en modell för inkommande data
