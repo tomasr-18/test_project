@@ -35,7 +35,8 @@ def train_model_endpoint(request: ModelRequest):
 
 @app.post("/predict/")
 def predict_endpoint(request: ModelRequest):
-    return os.getenv("RAW_DATA_TABLE_ID")
+    asd=os.getenv("RAW_DATA_TABLE_ID")
+    return {"key":asd}
 
 
 @app.post("/transfer_targets/")
