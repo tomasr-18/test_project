@@ -36,9 +36,10 @@ def train_model_endpoint(request: ModelRequest):
 
 @app.post("/predict/")
 def predict_endpoint(request: ModelRequest):
-    #asd = os.getenv("NEWS_API_KEY")
-    asd = os.environ("NEWS_API_KEY")
-    return {"key":asd}
+    asd = os.getenv("NEWS_API_KEY")
+    #asd = os.environ("NEWS_API_KEY")
+    test="123"
+    return {"key":asd,"ke2":test}
 
 
 @app.post("/transfer_targets/")
