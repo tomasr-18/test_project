@@ -37,10 +37,23 @@ def train_model_endpoint(request: ModelRequest):
 @app.post("/predict/")
 def predict_endpoint(request: ModelRequest):
     asd = os.getenv("NEWS_API_KEY")
-    #asd = os.environ("NEWS_API_KEY")
-    test="123"
-    return {"key":asd,"ke2":test}
+    company="AAPL"
+    from_date="2024-09-01"
+    to_date="2024-09-05"
+    sort_by="relevance"
+    url = f'https://newsapi.org/v2/everything?q={company}&from={from_date}&to={to_date}&sortBy={sort_by}&language={language}&apiKey={asd}'
 
+    import requests
+    response = requests.get(url=url)
+    response.raise_for_status()  # Kontrollera för HTTP-fel
+    data = response.json()
+
+    # Kontrollera om API-anropet innehåller fel
+    if data.get("status") != "ok":
+        raise ValueError(
+            f"API Error: {data.get('message', 'Unknown error')}")
+
+    return data
 
 @app.post("/transfer_targets/")
 def transfer_target_endpoint(request: ModelRequest):
