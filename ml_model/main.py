@@ -36,7 +36,8 @@ def train_model_endpoint(request: ModelRequest):
 
 @app.post("/predict/")
 def predict_endpoint(request: ModelRequest):
-    asd=os.getenv("RAW_DATA_TABLE_ID")
+    #asd = os.getenv("NEWS_API_KEY")
+    asd = os.environ("NEWS_API_KEY")
     return {"key":asd}
 
 
