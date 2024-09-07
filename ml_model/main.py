@@ -2,6 +2,7 @@ from pipline_to_ml import get_data_by_company, calculate_rolling_average, transf
 from fastapi import FastAPI#, HTTPException
 from pydantic import BaseModel
 from typing import Optional , List
+import os
 #import logging
 
 app = FastAPI()
@@ -34,7 +35,7 @@ def train_model_endpoint(request: ModelRequest):
 
 @app.post("/predict/")
 def predict_endpoint(request: ModelRequest):
-    pass
+    return os.getenv("RAW_DATA_TABLE_ID")
 
 
 @app.post("/transfer_targets/")
