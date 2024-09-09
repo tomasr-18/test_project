@@ -1,11 +1,13 @@
 from pipline_to_ml import get_data_by_company, calculate_rolling_average, transform_data_to_model,train_model#,scale_features
+from load_env import load_env_from_secret
 from fastapi import FastAPI#, HTTPException
 from pydantic import BaseModel
 from typing import Optional , List
 import os
-from dotenv import load_dotenv
 #import logging
-load_dotenv()
+
+load_env_from_secret(project_id="tomastestproject-433206",
+                     secret_name="my-env-file")
 app = FastAPI()
 
 # Definiera en modell för inkommande data

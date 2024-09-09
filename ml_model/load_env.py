@@ -2,7 +2,7 @@ import os
 from google.cloud import secretmanager
 
 
-def load_env_from_secret(secret_name, project_id):
+def load_env_from_secret(secret_name:str, project_id:str):
     # Skapa en klient för Secret Manager
     client = secretmanager.SecretManagerServiceClient()
 
@@ -19,9 +19,4 @@ def load_env_from_secret(secret_name, project_id):
         os.environ[key] = value
 
 
-# Använd funktionen för att ladda .env från Secret Manager  
-load_env_from_secret('my-env-file', 'tomastestproject-433206')
-
-
-# Fortsätt med att starta din applikation
 # t.ex., os.system("your_application_command")
