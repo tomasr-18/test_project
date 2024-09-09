@@ -6,9 +6,10 @@ from typing import Optional , List
 import os
 #import logging
 
-load_env_from_secret(project_id="tomastestproject-433206",
-                     secret_name="my-env-file")
+load_env_from_secret(project_id=os.getenv("PROJECT_ID"),
+                     secret_name=os.getenv("SECRET_NAME_ENV"))
 app = FastAPI()
+
 
 # Definiera en modell för inkommande data
 
