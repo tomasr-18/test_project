@@ -335,7 +335,7 @@ def insert_true_value_to_bigquery(
 
     # Run the query
     query_job = client.query(query)
-    results = query_job.result()
+    query_job.result()
 
     # Return the number of affected rows
     return query_job.num_dml_affected_rows
