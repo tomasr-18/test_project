@@ -24,3 +24,4 @@ fetch_stocks_raw_notebook.ipynb
 /ml_model/ml-model
 /ml_model/credentials
 /ml_model/.env
+fetch_news/test_fetch_raw_data.py
