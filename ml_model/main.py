@@ -20,7 +20,7 @@ class ModelRequest(BaseModel):
     project_id: Optional[str] = os.getenv("PROJECT_ID")
     dataset: Optional[str] = os.getenv("DATA_SET")
     table_from: Optional[str] = 'avg_scores_and_stock_data_right'
-    prediction_table: Optional[str] = 'predictions_copy'
+    prediction_table: Optional[str] = 'predictions'
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter
 
@@ -37,7 +37,10 @@ def train_model_endpoint(request: ModelRequest):
         # Fetch data by company
         try:
             df = get_data_by_company(
-                company=request.company_list, table=request.table_from)
+                                    company=request.company_list, 
+                                    table=request.table_from,
+                                    project_id=request.project_id,
+                                    dataset=request.dataset)
         except Exception as e:
             raise HTTPException(
                 status_code=500, detail=f"Error fetching data: {str(e)}")
@@ -83,7 +86,10 @@ def train_model_endpoint(request: ModelRequest):
         # Save predictions to BigQuery
         try:
             save_predictions_to_big_query(
-                data=list_to_big_query, table=request.prediction_table)
+                                            data=list_to_big_query,
+                                            table=request.prediction_table,
+                                            project_id=request.project_id,
+                                            dataset=request.dataset)
         except Exception as e:
             raise HTTPException(
                 status_code=500, detail=f"Error saving predictions to BigQuery: {str(e)}")
@@ -105,9 +111,14 @@ def train_model_endpoint(request: ModelRequest):
 
 @app.post("/get_true_values/")
 def get_true_values_endpoint(request: ModelRequest):
-   insert_true_value_to_bigquery()
+   try:
+    insert_true_value_to_bigquery(
+                                    prediction_table=request.prediction_table, 
+                                    table_from=request.table_from, 
+                                    project_id=request.project_id,
+                                    dataset=request.dataset
+                                    )
+   except Exception as e:
+       raise HTTPException(
+           status_code=500, detail=f"Error inserting true values to {request.prediction_table}: {str(e)}")
     
-
-@app.post("/transfer_targets/")
-def transfer_target_endpoint(request: ModelRequest):
-    pass

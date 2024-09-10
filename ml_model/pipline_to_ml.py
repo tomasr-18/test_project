@@ -12,9 +12,10 @@ from google.cloud import storage
 from datetime import datetime, timedelta, timezone
 import pandas_market_calendars as mcal
 import numpy as np
+import os
 
 
-def get_secret(secret_name='bigquery-accout-secret') -> str:
+def get_secret(project_id: str, secret_name = 'bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
 
     Args:
@@ -25,7 +26,6 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     """
     try:
         client = secretmanager.SecretManagerServiceClient()
-        project_id = 'tomastestproject-433206'  # Replace with your project ID
         secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
         response = client.access_secret_version(name=secret_path)
         secret_data = response.payload.data.decode('UTF-8')
@@ -38,9 +38,9 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
 
 
 def get_data_by_company(company: List[str],
-                        project_id='tomastestproject-433206',
-                        dataset='testdb_1',
-                        table='avg_scores_and_stock_data_right') -> pd.DataFrame:
+                        project_id:str,
+                        dataset:str,
+                        table:str) -> pd.DataFrame:
     """
     Retrieves data from a specified BigQuery table based on a list of company names.
 
@@ -52,7 +52,7 @@ def get_data_by_company(company: List[str],
     :return: A pandas DataFrame containing the query results filtered by the specified companies.
     """
     try:
-        secret_data = get_secret()
+        secret_data = get_secret(project_id=os.getenv("PROJECT_ID"))
         service_account_info = json.loads(secret_data)
         client = bigquery.Client.from_service_account_info(
             service_account_info)
@@ -168,16 +168,12 @@ def transform_data_to_model(df: pd.DataFrame, from_date="2024-08-02") -> pd.Data
     except Exception as e:
         raise Exception(f"Failed to transform data to model format: {e}")
 
-    except KeyError as e:
-        raise Exception(f"Missing expected column in DataFrame: {e}")
-    except Exception as e:
-        raise Exception(f"Failed to transform data to model format: {e}")
 
 
 def save_predictions_to_big_query(data: list,
-                                  project_id='tomastestproject-433206',
-                                  dataset='testdb_1',
-                                  table='predictions'):
+                                  project_id:str,
+                                  dataset:str,
+                                  table:str):
     """
     Saves a list of dictionaries to a specified BigQuery table.
 
@@ -187,7 +183,7 @@ def save_predictions_to_big_query(data: list,
     :param table: BigQuery table name.
     """
     try:
-        secret_data = get_secret()
+        secret_data = get_secret(project_id=os.getenv("PROJECT_ID"))
         service_account_info = json.loads(secret_data)
         client = bigquery.Client.from_service_account_info(
             service_account_info)
@@ -311,35 +307,42 @@ def save_model(model_dict: dict, date: str):
         blob = bucket.blob(model_file)
         blob.upload_from_file(
             model_bytes, content_type='application/octet-stream')
-        print(f"Model {model_file} saved successfully.")
+        return f"Model {model_file} saved successfully."
 
 
-def insert_true_value_to_bigquery():
-    secret_data = get_secret()
+def insert_true_value_to_bigquery(
+                                prediction_table:str,
+                                table_from:str,
+                                project_id:str,
+                                dataset:str
+                                ):
+    # Fetch secret data and create a BigQuery client
+    secret_data = get_secret(project_id=os.getenv("PROJECT_ID"))
     service_account_info = json.loads(secret_data)
-    client = bigquery.Client.from_service_account_info(
-        service_account_info)
+    client = bigquery.Client.from_service_account_info(service_account_info)
+    table_from_id = f"{project_id}.{dataset}.{table_from}"
+    prediction_table_id = f"{project_id}.{dataset}.{prediction_table}"
+    # Define the SQL query for updating the true_value column
+    query = f"""
+        UPDATE `{prediction_table_id}` p
+        SET p.true_value = closing_price.close
+        FROM `{table_from_id}` AS closing_price
+        WHERE 
+            p.company = closing_price.company
+            AND DATE(p.date) = closing_price.pub_date
+            AND p.true_value IS NULL;
+    """
 
-    # view_id = f"{project_id}.{dataset}.{table}"
-
-    query = """
-            
-            UPDATE `tomastestproject-433206.testdb_1.predictions_copy` p
-            SET p.true_value = closing_price.close
-            FROM `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right` AS closing_price
-            WHERE 
-                p.company = closing_price.company
-                AND DATE(p.date) = closing_price.pub_date
-                AND p.true_value IS NULL;
-
-  """
+    # Run the query
     query_job = client.query(query)
     results = query_job.result()
-    return results
+
+    # Return the number of affected rows
+    return query_job.num_dml_affected_rows
 
 
 def get_latest_date():
-    secret_data = get_secret()
+    secret_data = get_secret(project_id=os.getenv("PROJECT_ID"))
     service_account_info = json.loads(secret_data)
     client = bigquery.Client.from_service_account_info(
         service_account_info)
