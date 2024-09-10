@@ -1,3 +1,4 @@
+import io
 import pandas as pd
 import json
 from google.cloud import bigquery
@@ -6,6 +7,11 @@ from google.api_core.exceptions import GoogleAPICallError, NotFound, BadRequest
 from typing import List
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
+import joblib
+from google.cloud import storage
+from datetime import datetime, timedelta, timezone
+import pandas_market_calendars as mcal
+import numpy as np
 
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
@@ -20,7 +26,8 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     try:
         client = secretmanager.SecretManagerServiceClient()
         project_id = 'tomastestproject-433206'  # Replace with your project ID
-        secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+        secret_path = f"projects/{project_id}/secrets/{
+            secret_name}/versions/latest"
         response = client.access_secret_version(name=secret_path)
         secret_data = response.payload.data.decode('UTF-8')
         return secret_data
@@ -229,7 +236,8 @@ def train_model(df: pd.DataFrame, company_list=['AAPL', 'GOOGL', 'TSLA', 'AMZN',
         model.fit(X_train, y_train)
         model_dict[f'{company}_model'] = model
 
-    return model_dict, prediction_rows, date.iloc[0].strftime('%Y-%m-%dT%H:%M:%S')
+    # .strftime('%Y-%m-%dT%H:%M:%S')
+    return model_dict, prediction_rows, date.iloc[0]
 
 
 def scale_features(df: pd.DataFrame, features_to_scale=['open',	'high',	'low', 'close', 'volume', 'rolling_avg_close']) -> pd.DataFrame:
@@ -265,17 +273,102 @@ def make_prediction(models_dict: dict, x_pred: dict) -> dict:
 
 
 def transform_predictions_for_bq(predictions: dict, date: str) -> list:
+    def get_next_open_day(date, schedule):
+        date = date.to_pydatetime().date()
+        index = np.where(schedule == date)
+        return schedule[index[0][0]+1]
+
+    schedule = get_open_dates()
+
+    next_open_date = get_next_open_day(date=date, schedule=schedule)
+
+    insert_date = pd.Timestamp(next_open_date).strftime('%Y-%m-%d %H:%M:%S')
     to_bq = [
         {
             "company": company,
             # Vi antar att värdet alltid är en array med ett element
             "predicted_value": float(value[0]),
-            "date": date
+            "date": insert_date
         }
         for company, value in predictions.items()
     ]
-    return to_bq
+    return to_bq, next_open_date
 
 
-def save_models():
-    pass
+def save_model(model_dict: dict, date: str):
+    storage_client = storage.Client()
+    bucket_name = 'machine-models'
+    bucket = storage_client.get_bucket(bucket_name)
+
+    for model_name, model in model_dict.items():
+        model_file = f'{model_name}_{date[0:10]}'
+
+        # Skapa en byte-ström i minnet
+        model_bytes = io.BytesIO()
+        joblib.dump(model, model_bytes)
+        model_bytes.seek(0)  # Återställ pekaren till början av byte-strömmen
+
+        # Skapa en blob och ladda upp direkt från byte-strömmen
+        blob = bucket.blob(model_file)
+        blob.upload_from_file(
+            model_bytes, content_type='application/octet-stream')
+        print(f"Model {model_file} saved successfully.")
+
+
+def insert_true_value_to_bigquery():
+    secret_data = get_secret()
+    service_account_info = json.loads(secret_data)
+    client = bigquery.Client.from_service_account_info(
+        service_account_info)
+
+    # view_id = f"{project_id}.{dataset}.{table}"
+
+    query = """
+            
+            UPDATE `tomastestproject-433206.testdb_1.predictions_copy` p
+            SET p.true_value = closing_price.close
+            FROM `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right` AS closing_price
+            WHERE 
+                p.company = closing_price.company
+                AND DATE(p.date) = closing_price.pub_date
+                AND p.true_value IS NULL;
+
+  """
+    query_job = client.query(query)
+    results = query_job.result()
+    return results
+
+
+def get_latest_date():
+    secret_data = get_secret()
+    service_account_info = json.loads(secret_data)
+    client = bigquery.Client.from_service_account_info(
+        service_account_info)
+
+    # view_id = f"{project_id}.{dataset}.{table}"
+
+    query = """
+         SELECT
+    MAX(pub_date) AS latest_date
+FROM
+    `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right`
+
+  """
+    query_job = client.query(query)
+    results = query_job.to_dataframe()
+    latest_date = results.loc[0, 'latest_date']
+    return latest_date
+
+
+def get_open_dates(from_date=(datetime.now(timezone.utc) - timedelta(days=7)).date(), to_date=(datetime.now(timezone.utc) + timedelta(days=7)).date()):
+    # Skapa en kalender för NYSE
+    nyse = mcal.get_calendar('NYSE')
+
+    # Hämta marknadskalendern
+    schedule = nyse.schedule(start_date=from_date, end_date=to_date)
+
+    # Extrahera bara datumen från marknadens öppettider
+    open_dates = schedule.index.date
+
+    # Skriv ut datumen när börsen är öppen
+    return open_dates
