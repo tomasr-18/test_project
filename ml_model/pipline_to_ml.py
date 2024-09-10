@@ -267,7 +267,7 @@ def make_prediction(models_dict: dict, x_pred: dict) -> dict:
     return predictions_by_company
 
 
-def transform_predictions_for_bq(predictions: dict, date: str) -> list:
+def transform_predictions_for_bq(predictions: dict, date: str,model_names:list) -> list:
     def get_next_open_day(date, schedule):
         date = date.to_pydatetime().date()
         index = np.where(schedule == date)
@@ -281,20 +281,21 @@ def transform_predictions_for_bq(predictions: dict, date: str) -> list:
     to_bq = [
         {
             "company": company,
-            # Vi antar att värdet alltid är en array med ett element
+            # Assumes the value is always an array with one element
             "predicted_value": float(value[0]),
-            "date": insert_date
+            "date": insert_date,
+            "model_name": model_name  # Add the model name to each dictionary
         }
-        for company, value in predictions.items()
+        for (company, value), model_name in zip(predictions.items(), model_names)
     ]
     return to_bq, next_open_date
 
 
-def save_model(model_dict: dict, date: str):
+def save_model(model_dict: dict, date: str)->list:
     storage_client = storage.Client()
     bucket_name = 'machine-models'
     bucket = storage_client.get_bucket(bucket_name)
-
+    model_names=[]
     for model_name, model in model_dict.items():
         model_file = f'{model_name}_{date[0:10]}'
 
@@ -307,7 +308,8 @@ def save_model(model_dict: dict, date: str):
         blob = bucket.blob(model_file)
         blob.upload_from_file(
             model_bytes, content_type='application/octet-stream')
-        return f"Model {model_file} saved successfully."
+        model_names.append(model_file)
+    return model_names
 
 
 def insert_true_value_to_bigquery(
@@ -338,7 +340,7 @@ def insert_true_value_to_bigquery(
     query_job.result()
 
     # Return the number of affected rows
-    return query_job.num_dml_affected_rows
+    return {"messege":f"{query_job.num_dml_affected_rows} rows were transfered"}
 
 
 def get_latest_date():

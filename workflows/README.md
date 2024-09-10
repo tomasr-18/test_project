@@ -87,3 +87,15 @@ gcloud workflows deploy transfer-meta_data \
     --location=europe-west1 \
     --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
     
+    --
+      gcloud workflows deploy train_and_predict_model \
+    --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/train_and_predict.yaml\
+    --location=europe-west1 \
+    --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com
+
+    --
+
+      gcloud workflows deploy transfer_true_values_to_predictions \
+    --source=/Users/tomasrydenstam/Desktop/Skola/test_project/workflows/transfer_true_values_to_predictions.yaml\
+    --location=europe-west1 \
+    --service-account=workflow-service-account@tomastestproject-433206.iam.gserviceaccount.com  
