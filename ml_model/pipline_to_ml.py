@@ -267,7 +267,7 @@ def make_prediction(models_dict: dict, x_pred: dict) -> dict:
     return predictions_by_company
 
 
-def transform_predictions_for_bq(predictions: dict, date: str,model_names:list) -> list:
+def transform_predictions_for_bq(predictions: dict, date: str) -> list:
     def get_next_open_day(date, schedule):
         date = date.to_pydatetime().date()
         index = np.where(schedule == date)
@@ -281,12 +281,12 @@ def transform_predictions_for_bq(predictions: dict, date: str,model_names:list) 
     to_bq = [
         {
             "company": company,
-            # Assumes the value is always an array with one element
+            # Vi antar att värdet alltid är en array med ett element
             "predicted_value": float(value[0]),
             "date": insert_date,
-            "model_name": model_name  # Add the model name to each dictionary
+            "model_name": f"{company}_{insert_date[0:10]}"
         }
-        for (company, value), model_name in zip(predictions.items(), model_names)
+        for company, value in predictions.items()
     ]
     return to_bq, next_open_date
 

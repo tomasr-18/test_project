@@ -96,7 +96,7 @@ def train_model_endpoint(request: ModelRequest):
 
         # Save the model
         try:
-            model_name=save_model(model_dict=models,
+            save_model(model_dict=models,
                        date=predicted_date.strftime('%Y-%m-%d'))
         except Exception as e:
             raise HTTPException(
