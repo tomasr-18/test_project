@@ -112,12 +112,13 @@ def train_model_endpoint(request: ModelRequest):
 @app.post("/get_true_values/")
 def get_true_values_endpoint(request: ModelRequest):
    try:
-    insert_true_value_to_bigquery(
+    affected_rows=insert_true_value_to_bigquery(
                                     prediction_table=request.prediction_table, 
                                     table_from=request.table_from, 
                                     project_id=request.project_id,
                                     dataset=request.dataset
                                     )
+    return {"messege": affected_rows}
    except Exception as e:
        raise HTTPException(
            status_code=500, detail=f"Error inserting true values to {request.prediction_table}: {str(e)}")
