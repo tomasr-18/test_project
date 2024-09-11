@@ -269,7 +269,6 @@ def make_prediction(models_dict: dict, x_pred: dict) -> dict:
 
 def transform_predictions_for_bq(predictions: dict, date: str) -> list:
     def get_next_open_day(date, schedule):
-        date = date.to_pydatetime().date()
         index = np.where(schedule == date)
         return schedule[index[0][0]+1]
 
@@ -281,7 +280,6 @@ def transform_predictions_for_bq(predictions: dict, date: str) -> list:
     to_bq = [
         {
             "company": company,
-            # Vi antar att värdet alltid är en array med ett element
             "predicted_value": float(value[0]),
             "date": insert_date,
             "model_name": f"{company}_{insert_date[0:10]}"
@@ -295,7 +293,6 @@ def save_model(model_dict: dict, date: str)->list:
     storage_client = storage.Client()
     bucket_name = 'machine-models'
     bucket = storage_client.get_bucket(bucket_name)
-    model_names=[]
     for model_name, model in model_dict.items():
         model_file = f'{model_name}_{date[0:10]}'
 
@@ -308,8 +305,7 @@ def save_model(model_dict: dict, date: str)->list:
         blob = bucket.blob(model_file)
         blob.upload_from_file(
             model_bytes, content_type='application/octet-stream')
-        model_names.append(model_file)
-    return model_names
+   
 
 
 def insert_true_value_to_bigquery(
@@ -376,3 +372,13 @@ def get_open_dates(from_date=(datetime.now(timezone.utc) - timedelta(days=7)).da
 
     # Skriv ut datumen när börsen är öppen
     return open_dates
+
+
+# if __name__=="__main__":
+#     from load_env import load_env_from_secret
+#     load_env_from_secret(project_id="tomastestproject-433206", secret_name="my-env-file")
+#     latest_date=get_latest_date()
+#     schedule=get_open_dates()
+#     next_open_day=get_next_open_day(latest_date,schedule)
+#     print(latest_date)
+#     print(next_open_day)
