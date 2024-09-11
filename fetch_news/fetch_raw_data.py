@@ -5,6 +5,20 @@ from datetime import datetime
 import json
 from google.cloud import secretmanager
 import uuid
+from google.auth import default
+import os
+
+def get_project_id():
+    """Retrieve project ID from environment."""
+    #GOOGLE_CLOUD_PROJECT: This specific environment variable is used to store the Google Cloud project ID. 
+    #It allows the application to know which Google Cloud project it should interact with.
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+
+    if project_id is None:
+        # If not set, use google.auth.default to fetch the project ID
+        credentials, project_id = default()
+    
+    return project_id
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -19,7 +33,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     client = secretmanager.SecretManagerServiceClient()
 
     # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    project_id = get_project_id()  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
     # Hämta den senaste versionen av hemligheten
@@ -79,7 +93,7 @@ def fetch_news(company: str, api_key: str,
 def save_raw_data_to_big_query(data: dict, 
                                company: str, 
                                table='raw_news', 
-                               project_id='tomastestproject-433206', 
+                               project_id=os.getenv('GOOGLE_CLOUD_PROJECT'),     
                                dataset='testdb_1', 
                                secret='bigquery-accout-secret'):
     """
