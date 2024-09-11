@@ -6,7 +6,6 @@ import nltk
 from typing import Optional
 from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data, get_project_id, get_secret
 import logging
-import uvicorn
 
 
 
@@ -88,7 +87,7 @@ def transfer_to_meta_data_endpoint(request:TransferData):
 # Kör appen om detta script är huvudscripten
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    #import uvicorn
+    #uvicorn.run(app, host="0.0.0.0", port=8000)
     pass
 
