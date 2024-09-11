@@ -269,6 +269,7 @@ def make_prediction(models_dict: dict, x_pred: dict) -> dict:
 
 def transform_predictions_for_bq(predictions: dict, date: str) -> list:
     def get_next_open_day(date, schedule):
+        date = date.to_pydatetime().date()
         index = np.where(schedule == date)
         return schedule[index[0][0]+1]
 
@@ -374,11 +375,5 @@ def get_open_dates(from_date=(datetime.now(timezone.utc) - timedelta(days=7)).da
     return open_dates
 
 
-# if __name__=="__main__":
-#     from load_env import load_env_from_secret
-#     load_env_from_secret(project_id="tomastestproject-433206", secret_name="my-env-file")
-#     latest_date=get_latest_date()
-#     schedule=get_open_dates()
-#     next_open_day=get_next_open_day(latest_date,schedule)
-#     print(latest_date)
-#     print(next_open_day)
+
+
