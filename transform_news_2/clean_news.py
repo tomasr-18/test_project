@@ -45,7 +45,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
 
 def get_raw_news_from_big_query(raw_data_table=get_secret('RAW_DATA_TABLE'),
                                 meta_data_table=get_secret('RAW_NEWS_META_DATA'),
-                                project_id=get_project_id(), 
+                                project_id=None, 
                                 dataset= get_secret('dataset')):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
@@ -68,6 +68,9 @@ def get_raw_news_from_big_query(raw_data_table=get_secret('RAW_DATA_TABLE'),
     Raises:
         ValueError: If no unprocessed data is found in the table.xw
     """
+    if project_id is None:
+        project_id = get_project_id()
+
     secret_data = get_secret()
 
     # Ladda JSON-strängen till en dictionary
