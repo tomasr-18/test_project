@@ -1,2 +1,6 @@
 flask
 plotly
+google-cloud-secret-manager
+google-cloud-bigquery
+pandas
+db-dtypes

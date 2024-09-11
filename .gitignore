@@ -29,8 +29,5 @@ test_clean_news.py
 /ml_model/credentials
 /ml_model/.env
 
-<<<<<<< HEAD
 /frontend/frontend
-=======
 load_env.py
->>>>>>> origin/main

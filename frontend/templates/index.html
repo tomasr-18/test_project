@@ -18,12 +18,21 @@
 
         </div>
         <div class="topbar-stats">
+            <div class="stat" id="latest-run" style="background-color: #FFB347">
+                <div class="stat-container">
+                    <h3>Model</h3>
+                    <div class="stat-info">
+                        <p>Name</p>
+                        <h2 id="stat-value">{{latest_model_name}}</h2>
+                    </div>
+                </div>
+            </div>
             <div class="stat" id="latest-run" style="background-color: #17c3b2;">
                 <div class="stat-container">
                     <h3>Latest Run</h3>
                     <div class="stat-info">
                         <p>Date</p>
-                        <h2 id="stat-value">2024-09-09</h2>
+                        <h2 id="stat-value">{{latest_date}}</h2>
                     </div>
                 </div>
             </div>
@@ -32,7 +41,7 @@
                     <h3>Prediction</h3>
                     <div class="stat-info">
                         <p>Price</p>
-                        <h2 id="stat-value">1.23 $</h2>
+                        <h2 id="stat-value">{{prediction}} $</h2>
                     </div>
                 </div>
             </div>
@@ -41,7 +50,7 @@
                     <h3>Closing Price</h3>
                     <div class="stat-info">
                         <p>Price</p>
-                        <h2 id="stat-value">1.42 $</h2>
+                        <h2 id="stat-value">{{true_value}} $</h2>
                     </div>
                 </div>
             </div>
@@ -50,7 +59,7 @@
                     <h3>Difference</h3>
                     <div class="stat-info">
                         <p>Price</p>
-                        <h2 id="stat-value">0.19 $</h2>
+                        <h2 id="stat-value">{{difference_price}} $</h2>
                     </div>
                 </div>
             </div>
@@ -68,9 +77,9 @@
                           </thead>
                         {% for model in models %}
                         <tr class="table-row">
-                            <td>{{ model.modelname }}</td>
-                            <td>{{ model.MAE }}</td>
-                            <td>{{ model.MAPE }}</td>
+                            <td>{{ model.model_name }}</td>
+                            <td>{{ model.mae }}</td>
+                            <td>{{ model.mape }}</td>
                         </tr>
                         {% endfor %}
                     </table>
