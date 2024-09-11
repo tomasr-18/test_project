@@ -16,7 +16,7 @@ def get_project_id():
 
     if project_id is None:
         # If not set, use google.auth.default to fetch the project ID
-        credentials, project_id = default()
+        project_id = default()
     
     return project_id
 
@@ -71,9 +71,9 @@ def clean_and_insert_data(client, results, cleaned_data_table_id: str):
     errors = client.insert_rows_json(cleaned_data_table_id, rows_to_insert)
     if errors:
         logging.error(f"Encountered errors while inserting rows: {errors}")
-        raise HTTPException(status_code=500, detail=f"Error inserting rows: {errors}")
-    logging.info("Cleaned data successfully inserted.")
-    return {"status": "success", "message": "Cleaned data successfully inserted."}
+        for error in errors:
+            logging.error(f"Error details: {error}")
+    raise HTTPException(status_code=500, detail=f"Error inserting rows: {errors}")
 
 @app.post("/clean-stock-data/")
 def clean_stock_data():
