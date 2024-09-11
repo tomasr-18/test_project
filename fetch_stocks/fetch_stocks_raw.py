@@ -11,7 +11,7 @@ from google.cloud import secretmanager
 import uvicorn
 from pydantic import BaseModel
 
-load_dotenv()
+
 # Load environment variables
 STOCK_API_KEY = os.getenv('STOCK_API_KEY') 
 PROJECT_ID = os.environ.get('PROJECT_ID') 
