@@ -11,10 +11,6 @@ load_env_from_secret(project_id=os.getenv("PROJECT_ID"),
                      secret_name=os.getenv("SECRET_NAME_ENV"))
 app = FastAPI()
 
-
-# Definiera en modell för inkommande data
-
-
 class ModelRequest(BaseModel):
     company_list: Optional[List[str]] = ['AAPL', 'GOOGL', 'TSLA', 'AMZN', 'MSFT']
     project_id: Optional[str] = os.getenv("PROJECT_ID")
@@ -22,7 +18,6 @@ class ModelRequest(BaseModel):
     table_from: Optional[str] = 'avg_scores_and_stock_data_right'
     prediction_table: Optional[str] = 'predictions'
 
-# Definiera POST endpoint för att hämta, rensa och analysera nyheter
 
 @app.post("/train_and_predict/")
 def train_model_endpoint(request: ModelRequest):
