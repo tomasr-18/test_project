@@ -5,13 +5,26 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 import uvicorn
 import logging
-
+from google.auth import default
 app = FastAPI()
+
+def get_project_id():
+    """Retrieve project ID from environment."""
+    #GOOGLE_CLOUD_PROJECT: This specific environment variable is used to store the Google Cloud project ID. 
+    #It allows the application to know which Google Cloud project it should interact with.
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+
+    if project_id is None:
+        # If not set, use google.auth.default to fetch the project ID
+        credentials, project_id = default()
+    
+    return project_id
+
 
 def get_secret(secret_name: str) -> str:
     """Fetches a secret from Google Cloud Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = 'tomastestproject-433206'
+    project_id = get_project_id()
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
     response = client.access_secret_version(name=secret_path)
     secret_data = response.payload.data.decode('UTF-8')
@@ -73,9 +86,7 @@ def clean_stock_data():
         service_account_info = json.loads(secret_data)
         client = bigquery.Client.from_service_account_info(service_account_info)
         
-        # Fetch other secrets
-        project_id = get_secret("PROJECT_ID")
-        stock_api_key = get_secret("STOCK_API_KEY")
+        # Load table IDs
         raw_data_table_id = get_secret("RAW_DATA_TABLE_ID")
         cleaned_data_table_id = get_secret("CLEANED_DATA_TABLE_ID")
         

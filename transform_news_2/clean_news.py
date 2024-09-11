@@ -311,10 +311,13 @@ def make_table(table_name=get_secret('CLEAN_NEWS'), project_id=None, database=ge
     # Initiera BigQuery-klienten
     if project_id is None:
         project_id = get_project_id()
-    client = bigquery.Client.from_service_account_json(
-        '/Users/tomasrydenstam/Desktop/Skola/test_project/transform_news/tomastestproject-433206-adc5bc090976.json'
-    )
+    secret_data = get_secret()
 
+    # Ladda JSON-strängen till en dictionary
+    service_account_info = json.loads(secret_data)
+
+    # Initiera BigQuery-klienten med service account
+    client = bigquery.Client.from_service_account_info( service_account_info)
     table_id = f"{project_id}.{database}.{table_name}"
 
     # Definiera schema med uppdaterat kolumnnamn
