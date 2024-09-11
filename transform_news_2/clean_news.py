@@ -1,3 +1,5 @@
+
+
 import pandas as pd
 from google.cloud import bigquery
 from nltk.sentiment import SentimentIntensityAnalyzer
@@ -43,7 +45,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(raw_data_table=get_secret('RAW_DATA_TABLE'),
+def get_raw_news_from_big_query(raw_data_table=get_secret('RAW_NEWS_DATA'),
                                 meta_data_table=get_secret('RAW_NEWS_META_DATA'),
                                 project_id=None, 
                                 dataset= get_secret('dataset')):
