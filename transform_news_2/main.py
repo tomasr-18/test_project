@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import nltk
 from typing import Optional
-from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data
+from clean_news import get_raw_news_from_big_query, clean_news, predict_sentiment, write_clean_news_to_bq, update_is_processed,transfer_ids_to_meta_data, get_project_id, get_secret
 import logging
 
 
@@ -17,17 +17,17 @@ app = FastAPI()
 
 
 class NewsRequest(BaseModel):
-    project_id: Optional[str] = 'tomastestproject-433206'
-    dataset: Optional[str] = 'testdb_1'
-    fetch_table: Optional[str] = 'raw_news_data'
-    write_table: Optional[str]= 'clean_news_data'
-    meta_data_table: Optional[str] = 'raw_news_meta_data'
+    project_id: Optional[str] = get_project_id()
+    dataset: Optional[str] = get_secret('dataset')
+    fetch_table: Optional[str] = get_secret('RAW_NEWS_DATA')
+    write_table: Optional[str]= get_secret('CLEAN_NEWS_DATA')
+    meta_data_table: Optional[str] = get_secret('RAW_NEWS_META_DATA')
     
 class TransferData(BaseModel):
-    project_id: Optional[str] = 'tomastestproject-433206'
-    dataset: Optional[str] = 'testdb_1'
-    table_from: Optional[str] = 'raw_news_data'
-    table_to: Optional[str] = 'raw_news_meta_data'
+    project_id: Optional[str] = get_project_id()
+    dataset: Optional[str] = get_secret('dataset')
+    table_from: Optional[str] = get_secret('RAW_NEWS_DATA')
+    table_to: Optional[str] = get_secret('RAW_NEWS_META_DATA')
 
 
 # Definiera POST endpoint för att hämta, rensa och analysera nyheter

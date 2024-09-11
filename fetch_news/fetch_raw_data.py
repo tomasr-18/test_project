@@ -93,7 +93,7 @@ def save_raw_data_to_big_query(data: dict,
                                company: str, 
                                table='raw_news', 
                                project_id=get_project_id(),     
-                               dataset='testdb_1', 
+                               dataset= get_secret('dataset'), 
                                secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
