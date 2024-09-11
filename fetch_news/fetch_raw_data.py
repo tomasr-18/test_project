@@ -9,14 +9,13 @@ from google.auth import default
 import os
 
 def get_project_id():
-    """Retrieve project ID from environment."""
-    #GOOGLE_CLOUD_PROJECT: This specific environment variable is used to store the Google Cloud project ID. 
-    #It allows the application to know which Google Cloud project it should interact with.
+    """Retrieve project ID either from environment or default credentials."""
+    # First, check if the GOOGLE_CLOUD_PROJECT env var is set
     project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
-
-    if project_id is None:
-        # If not set, use google.auth.default to fetch the project ID
-        credentials, project_id = default()
+    
+    if not project_id:
+        # If not set, retrieve the project ID from default credentials
+        _, project_id = default()
     
     return project_id
 
@@ -93,7 +92,7 @@ def fetch_news(company: str, api_key: str,
 def save_raw_data_to_big_query(data: dict, 
                                company: str, 
                                table='raw_news', 
-                               project_id=os.getenv('GOOGLE_CLOUD_PROJECT'),     
+                               project_id=get_project_id(),     
                                dataset='testdb_1', 
                                secret='bigquery-accout-secret'):
     """
