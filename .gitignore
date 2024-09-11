@@ -5,8 +5,8 @@ fetch_news/app_3_notebook.ipynb
 
 
 
-
-
+.ruff_cache
+.pytest_cache
 transform_news_2/tomastestproject-433206-adc5bc090976.json
 
 transform_stocks/fetch_stocks_clean_daily.ipynb
@@ -17,12 +17,20 @@ testing.ipynb
 fetch_stocks_raw.ipynb
 fetch_stocks_raw2.py
 fetch_stocks_raw_notebook.ipynb
+fixing.py
+clean_stocks_copy.py
 
 
 
 
+
+test_clean_news.py
 /ml_model/ml-model
 /ml_model/credentials
 /ml_model/.env
 
+<<<<<<< HEAD
 /frontend/frontend
+=======
+load_env.py
+>>>>>>> origin/main

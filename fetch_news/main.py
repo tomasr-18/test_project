@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI()
 
-
 class QueryParameters(BaseModel):
     company: str
     from_date: Optional[str] = ((datetime.now(timezone.utc)) -timedelta(days=1)).strftime('%Y-%m-%d')

@@ -1,0 +1,17 @@
+main:
+  params: []  # No input parameters required for this example
+
+  steps:
+    - call_service:
+        call: http.post
+        args:
+          url: "https://ml-model-839243415895.europe-west1.run.app/train_and_predict/"
+          auth:
+            type: OIDC  # Use OpenID Connect for authentication
+          headers:
+            Content-Type: "application/json"
+          body: {}  # Empty body
+        result: service_response
+
+    - return_result:
+        return: ${service_response.body}

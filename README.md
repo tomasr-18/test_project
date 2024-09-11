@@ -9,13 +9,15 @@
 
 Kod som är deployad i GCP:
 -fetch_news
--transform_news
-
+-transform_news_2
+-create_table (cloud function)
+-fetch_stocks
+-ml_model
 
 Ordning på workflows:
-fetch_news_ny
-update_news_meta_data
-clean_news_ny
+fetch_news_ny -> update_news_meta_data -> clean_news_ny
+fetch_stocks             ->               clean_stocks 
+                                                      get_true_values -> train_and_predict
 
 --Linting localy--
 
