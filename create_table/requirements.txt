@@ -1,0 +1,6 @@
+functions-framework==3.*
+google-cloud-bigquery==3.11.2
+google-cloud-secret-manager==2.15.0
+functions-framework==3.0.0
+uvicorn==0.22.0
+pydantic

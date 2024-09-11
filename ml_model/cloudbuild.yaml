@@ -1,0 +1,16 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/ml-model/model-img', '-f', 'ml_model/Dockerfile', 'ml_model']
+- name: 'gcr.io/cloud-builders/docker'        
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/ml-model/model-img']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['run', 'deploy', 'ml-model', 
+          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/ml-model/model-img',
+          '--platform', 'managed',
+          '--region', 'europe-west1']
+
+options:  
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
