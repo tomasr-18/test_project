@@ -7,6 +7,7 @@ from fetch_raw_data import fetch_news,save_raw_data_to_big_query, get_secret
 
 
 
+
 app = FastAPI()
 
 class QueryParameters(BaseModel):
