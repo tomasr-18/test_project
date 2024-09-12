@@ -5,16 +5,45 @@ from google.cloud import bigquery
 from google.cloud import secretmanager
 import uvicorn
 import logging
+from google.auth import default
 
 app = FastAPI()
 
-def get_secret(secret_name: str) -> str:
-    """Fetches a secret from Google Cloud Secret Manager."""
+def get_project_id():
+    """Retrieve project ID from environment."""
+    #GOOGLE_CLOUD_PROJECT: This specific environment variable is used to store the Google Cloud project ID. 
+    #It allows the application to know which Google Cloud project it should interact with.
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+
+    if project_id is None:
+        # If not set, use google.auth.default to fetch the project ID
+        credentials, project_id = default()
+    
+    return project_id
+
+
+def get_secret(secret_name='bigquery-accout-secret') -> str:
+    """Fetches a secret from Google Cloud Secret Manager.
+
+    Args:
+        secret_name (str): The name of the secret in Secret Manager.
+
+    Returns:
+        str: The secret data as a string.
+    """
+    # Instansiera en klient för Secret Manager
     client = secretmanager.SecretManagerServiceClient()
-    project_id = get_secret("PROJECT_ID")  # Replace with your actual GCP project ID
+
+    # Bygg sökvägen till den hemlighet du vill hämta
+    project_id = get_project_id()  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
+
+    # Hämta den senaste versionen av hemligheten
     response = client.access_secret_version(name=secret_path)
+
+    # Dekoda hemligheten till en sträng
     secret_data = response.payload.data.decode('UTF-8')
+
     return secret_data
 
 def fetch_raw_data(client, raw_data_table_id: str):
