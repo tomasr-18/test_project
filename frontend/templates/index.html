@@ -18,21 +18,29 @@
 
         </div>
         <div class="topbar-stats">
-            <div class="stat" id="latest-run" style="background-color: #FFB347">
+            <div class="stat" id="latest-run" style="background-color: #17c3b2;">
+                <div class="stat-container">
+                    <h3>Company</h3>
+                    <div class="stat-info">
+                        <p>Name</p>
+                        <form action="/" method="POST" id="dropdownForm">
+                            <select id="dropdown" name="dropdown" onchange="document.getElementById('dropdownForm').submit();">
+                                <option value="TSLA" {% if selected_option == 'TSLA' %} selected {% endif %}>Tesla</option>
+                                <option value="AAPL" {% if selected_option == 'AAPL' %}selected{% endif %}>Apple</option>
+                                <option value="GOOGL" {% if selected_option == 'GOOGL' %}selected{% endif %}>Google</option>
+                                <option value="MSFT" {% if selected_option == 'MSFT' %}selected{% endif %}>Microsoft</option>
+                                <option value="AMZN" {% if selected_option == 'AMZN' %}selected{% endif %}>Amazon</option>
+                            </select>
+                          </form>
+                    </div>
+                </div>
+            </div>
+            <div class="stat" id="latest-run" style="background-color: #17c3b2">
                 <div class="stat-container">
                     <h3>Model</h3>
                     <div class="stat-info">
                         <p>Name</p>
                         <h2 id="stat-value">{{latest_model_name}}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="stat" id="latest-run" style="background-color: #17c3b2;">
-                <div class="stat-container">
-                    <h3>Latest Run</h3>
-                    <div class="stat-info">
-                        <p>Date</p>
-                        <h2 id="stat-value">{{latest_date}}</h2>
                     </div>
                 </div>
             </div>
@@ -79,7 +87,7 @@
                         <tr class="table-row">
                             <td>{{ model.model_name }}</td>
                             <td>{{ model.mae }}</td>
-                            <td>{{ model.mape }}</td>
+                            <td>{{ model.mape }}%</td>
                         </tr>
                         {% endfor %}
                     </table>

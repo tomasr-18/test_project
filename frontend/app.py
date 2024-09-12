@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import plotly.express as px
 import plotly.graph_objs as go
 import json
@@ -73,8 +73,8 @@ def get_data_from_bigquery():
         true_value,
         predicted_value,
         date,
-        mape,
-        mae
+        ROUND(mape, 3) AS mape,
+        ROUND(mae, 3) as mae
     FROM 
         ranked_predictions
     WHERE 
@@ -88,7 +88,7 @@ def get_data_from_bigquery():
     results = query_job.result()
 
     # Convert results to a DataFrame
-    df = results.to_dataframe()
+    df = results.to_dataframe().sort_values('date', ascending=False)
 
     # Check if DataFrame is empty and raise an error if needed
     if df.empty:
@@ -103,17 +103,39 @@ def get_data_from_bigquery():
 # Initialize Flask app
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
+@app.route('/', methods=['GET', 'POST'])
+def dashboard():
+
+    
+    if request.method == 'POST':
+        selected_option = request.form.get('dropdown', 'AAPL')  # Get the selected option from the form
+    else:
+        selected_option = 'AAPL'  # Default selected option
     
     df = get_data_from_bigquery()
     models = df.to_dict(orient='records')
 
-    latest_model_name = models[0]['model_name']
-    latest_date = models[0]['date'].date()
-    latest_prediction = round(models[0]['predicted_value'], 2)
-    latest_true_value = round(models[0]['true_value'], 2)
-    difference_price = round(latest_true_value - latest_prediction, 2)
+    # Filter the data to only include the selected company
+    filtered_df = df[df['company'] == selected_option]
+
+    # Sort the data by date to get the latest model
+    filtered_df = filtered_df.sort_values(by='date', ascending=False)
+
+        # Extract details of the latest model
+    if not filtered_df.empty:
+        latest_model_name = filtered_df.iloc[0]['model_name']
+        latest_date = filtered_df.iloc[0]['date'].date()
+        latest_prediction = round(filtered_df.iloc[0]['predicted_value'], 2)
+        latest_true_value = round(filtered_df.iloc[0]['true_value'], 2)
+        difference_price = round(latest_true_value - latest_prediction, 2)
+    else:
+        # Handle case where there is no data for the selected company
+        latest_model_name = "No data"
+        latest_date = None
+        latest_prediction = 0
+        latest_true_value = 0
+        difference_price = 0
+
 
 
     # Example data for the graph
@@ -130,7 +152,16 @@ def hello_world():
 
 
 
-    return render_template('index.html', latest_model_name=latest_model_name, latest_date=latest_date, difference_price=difference_price, prediction=latest_prediction, true_value=latest_true_value, models=models, graphJSON=graphJSON)
+    return render_template('index.html', 
+                           selected_option=selected_option,
+                           latest_model_name=latest_model_name, 
+                           latest_date=latest_date, 
+                           difference_price=difference_price, 
+                           prediction=latest_prediction, 
+                           true_value=latest_true_value, 
+                           models=models, 
+                           graphJSON=graphJSON
+                           )
 
 if __name__ == '__main__':
     app.run(debug=True)

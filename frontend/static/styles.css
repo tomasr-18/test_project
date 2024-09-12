@@ -63,7 +63,7 @@ body{
     align-items: flex-start;
     border-radius: 20px;
     background-color: #fff  ;  
-    height: 350px;
+    height: 400px;
     overflow: hidden;
 }
 
@@ -114,8 +114,6 @@ body{
 .dash-container table tbody tr:hover {
     background-color: #ddd; /* Add hover effect to rows */
 }
-
-
 
 
 #plotly-graph{
@@ -192,4 +190,19 @@ body{
     font-size: 1.5em;
     text-align: start;
     width: 100%;
+}
+
+
+#dropdown{
+    font-size: 1.5em;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    color: white;
+}
+
+#dropdown option{
+    background-color: #17c3b2;
+    border: none;
 }
