@@ -67,11 +67,6 @@ def clean_and_insert_data(client, results, cleaned_data_table_id: str):
         raw_data_str = row['raw_data']
         raw_data_json = json.loads(raw_data_str)
         time_series = raw_data_json.get("Time Series (Daily)", {})
-            
-        
-        # Parse raw_data_str from string to JSON
-        raw_data_json = json.loads(raw_data_str)
-        time_series = raw_data_json.get("Time Series (Daily)", {})
         
         for date, daily_data in time_series.items():
                 cleaned_row = {
