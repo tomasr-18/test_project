@@ -11,7 +11,7 @@ app = FastAPI()
 def get_secret(secret_name: str) -> str:
     """Fetches a secret from Google Cloud Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = 'tomastestproject-433206'
+    project_id = get_secret("PROJECT_ID")  # Replace with your actual GCP project ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
     response = client.access_secret_version(name=secret_path)
     secret_data = response.payload.data.decode('UTF-8')
@@ -73,8 +73,7 @@ def clean_stock_data():
         service_account_info = json.loads(secret_data)
         client = bigquery.Client.from_service_account_info(service_account_info)
         
-        # Fetch other secrets
-     
+        # Fetch table IDs from secrets
         raw_data_table_id = get_secret("RAW_DATA_TABLE_ID")
         cleaned_data_table_id = get_secret("CLEANED_DATA_TABLE_ID")
         
