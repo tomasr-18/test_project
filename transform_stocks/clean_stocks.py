@@ -64,24 +64,26 @@ def clean_and_insert_data(client, results, cleaned_data_table_id: str):
     """
     rows_to_insert = []
     for row in results:
-        stock_symbol = row.stock_symbol
-        raw_data_str = row.raw_data
+        raw_data_str = row['raw_data']
+        raw_data_json = json.loads(raw_data_str)
+        time_series = raw_data_json.get("Time Series (Daily)", {})
+            
         
         # Parse raw_data_str from string to JSON
         raw_data_json = json.loads(raw_data_str)
         time_series = raw_data_json.get("Time Series (Daily)", {})
         
         for date, daily_data in time_series.items():
-            cleaned_row = {
-                "stock_symbol": stock_symbol,
-                "date": date,
-                "open": float(daily_data["1. open"]),
-                "high": float(daily_data["2. high"]),
-                "low": float(daily_data["3. low"]),
-                "close": float(daily_data["4. close"]),
-                "volume": int(daily_data["5. volume"]),
-            }
-            rows_to_insert.append(cleaned_row)
+                cleaned_row = {
+                    "stock_symbol": row['stock_symbol'],
+                    "date": date,
+                    "open": float(daily_data["1. open"]),
+                    "high": float(daily_data["2. high"]),
+                    "low": float(daily_data["3. low"]),
+                    "close": float(daily_data["4. close"]),
+                    "volume": int(daily_data["5. volume"]),
+                }
+                rows_to_insert.append(cleaned_row)
     
     # Insert cleaned rows into BigQuery
     errors = client.insert_rows_json(cleaned_data_table_id, rows_to_insert)
