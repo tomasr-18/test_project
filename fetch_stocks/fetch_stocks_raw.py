@@ -6,7 +6,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from google.cloud import bigquery
 from google.oauth2 import service_account
-from dotenv import load_dotenv
 from google.cloud import secretmanager
 import uvicorn
 from pydantic import BaseModel
