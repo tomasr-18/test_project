@@ -10,12 +10,20 @@ from dotenv import load_dotenv
 from google.cloud import secretmanager
 import uvicorn
 from pydantic import BaseModel
+from google.auth import default
 
-load_dotenv()
-# Load environment variables
-STOCK_API_KEY = os.getenv('STOCK_API_KEY') 
-PROJECT_ID = os.environ.get('PROJECT_ID') 
-RAW_DATA_TABLE_ID = os.getenv('RAW_DATA_TABLE_ID') 
+def get_project_id():
+    """Retrieve project ID from environment."""
+    #GOOGLE_CLOUD_PROJECT: This specific environment variable is used to store the Google Cloud project ID. 
+    #It allows the application to know which Google Cloud project it should interact with.
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+
+    if project_id is None:
+        # If not set, use google.auth.default to fetch the project ID
+        credentials, project_id = default()
+    
+    return project_id
+
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -30,7 +38,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     client = secretmanager.SecretManagerServiceClient()
 
     # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    project_id = get_project_id()  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
     # Hämta den senaste versionen av hemligheten
@@ -40,6 +48,11 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     secret_data = response.payload.data.decode('UTF-8')
 
     return secret_data
+
+STOCK_API_KEY = get_secret('STOCK_API_KEY') 
+PROJECT_ID = get_project_id()
+RAW_DATA_TABLE_ID = get_secret('RAW_DATA_TABLE_ID') 
+
 
 app = FastAPI()
 
@@ -64,6 +77,10 @@ def fetch_raw_stock_data(stock_symbol: str) -> dict:
         response = requests.get(url=url)
         response.raise_for_status()
         data = response.json()
+
+        if "Information" in data and "Alpha Vantage" in data["Information"]:
+            raise ValueError(f"API Rate Limit Exceeded: {data['Information']}")
+
 
         if "Error Message" in data:
             raise ValueError(f"API Error: {data['Error Message']}")
@@ -123,7 +140,7 @@ async def handle_raw_stock_data(stock_request: StockRequest):
     
 
         # Save raw stock data to BigQuery
-        save_raw_stock_data(stock_symbol=stock_request.stock_symbol, stock_data=data, raw_data_table_id=os.getenv('RAW_DATA_TABLE_ID')) 
+        save_raw_stock_data(stock_symbol=stock_request.stock_symbol, stock_data=data, raw_data_table_id=get_secret('RAW_DATA_TABLE_ID') ) 
         
         return JSONResponse(content={"message": "Rows successfully inserted."})
     except HTTPException as e:
