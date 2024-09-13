@@ -14,7 +14,7 @@ def setup_environment():
     # Path to the JSON key file
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp-key.json"
     # Replace with your API key from GitHub secrets
-    os.environ["NEWS_API_KEY"] = os.getenv("NEWS_API_KEY")
+    os.environ["NEWS_API_KEY"] = "f43cc14666d14a8fab13a6daced8f7d4"
 
 
 def test_fetch_news_and_save():
