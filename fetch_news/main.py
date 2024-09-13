@@ -3,8 +3,10 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta,timezone
-
 from fetch_raw_data import fetch_news,save_raw_data_to_big_query, get_secret
+
+
+
 
 app = FastAPI()
 
@@ -25,7 +27,8 @@ def fetch_news_and_save(params: QueryParameters):
             company=params.company,
             from_date=params.from_date,
             to_date=params.to_date,
-            api_key=get_secret('NEWS_API_KEY'))
+            api_key=get_secret('NEWS_API_KEY')
+        )
 
         if not news_data or 'articles' not in news_data or len(news_data['articles']) == 0:
             raise HTTPException(status_code=404, detail="No data found.")

@@ -5,6 +5,19 @@ from datetime import datetime
 import json
 from google.cloud import secretmanager
 import uuid
+from google.auth import default
+import os
+
+def get_project_id():
+    """Retrieve project ID either from environment or default credentials."""
+    # First, check if the GOOGLE_CLOUD_PROJECT env var is set
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+    
+    if not project_id:
+        # If not set, retrieve the project ID from default credentials
+        _, project_id = default()
+    
+    return project_id
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -19,7 +32,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     client = secretmanager.SecretManagerServiceClient()
 
     # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    project_id = get_project_id()  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
     # Hämta den senaste versionen av hemligheten
@@ -79,8 +92,8 @@ def fetch_news(company: str, api_key: str,
 def save_raw_data_to_big_query(data: dict, 
                                company: str, 
                                table='raw_news', 
-                               project_id='tomastestproject-433206', 
-                               dataset='testdb_1', 
+                               project_id=get_project_id(),     
+                               dataset= get_secret('dataset'), 
                                secret='bigquery-accout-secret'):
     """
     Sparar rådata till BigQuery med datum och företagsnamn.
