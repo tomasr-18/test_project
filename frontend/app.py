@@ -179,8 +179,19 @@ def dashboard():
         )
     ]
 
+        # Create the layout with the company name as the title
+    layout = go.Layout(
+        title=f'{selected_option} Stock Prices',
+        xaxis=dict(title='Date'),
+        yaxis=dict(title='Price (USD)')
+    )
+
+    # Create the figure with data and layout
+    fig = go.Figure(data=data, layout=layout)
+
+
     # Convert the figure to JSON
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 
 
