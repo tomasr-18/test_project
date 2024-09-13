@@ -23,6 +23,14 @@ def get_project_id():
     
     return project_id
 
+STOCK_API_KEY = None  # Initialize as None
+
+def get_stock_api_key():
+    global STOCK_API_KEY
+    if STOCK_API_KEY is None:  # Only fetch the key if it's not already set
+        STOCK_API_KEY = get_secret('STOCK_API_KEY')
+    return STOCK_API_KEY
+
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -47,8 +55,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     secret_data = response.payload.data.decode('UTF-8')
 
     return secret_data
-
-STOCK_API_KEY = get_secret('STOCK_API_KEY') 
+ 
 PROJECT_ID = get_project_id()
 RAW_DATA_TABLE_ID = get_secret('RAW_DATA_TABLE_ID') 
 
