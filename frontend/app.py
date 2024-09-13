@@ -43,42 +43,50 @@ def get_data_from_bigquery() -> pd.DataFrame:
 
     # Build your SQL query
     query = f"""
-    WITH ranked_predictions AS (
-        SELECT 
-            company,
-            model_name,
-            true_value,
-            predicted_value,
-            date,
-            -- Mean Absolute Percentage Error (MAPE)
-            CASE 
-                WHEN true_value != 0 THEN ABS((true_value - predicted_value) / true_value) * 100
-                ELSE NULL  -- Handle division by zero
-            END AS mape,
-            -- Mean Absolute Error (MAE)
-            ABS(true_value - predicted_value) AS mae,
-            ROW_NUMBER() OVER (PARTITION BY model_name ORDER BY date DESC) AS rn
-        FROM 
-            `tomastestproject-433206.testdb_1.predictions`
-        WHERE
-            company IS NOT NULL AND
-            model_name IS NOT NULL AND
-            true_value IS NOT NULL AND
-            predicted_value IS NOT NULL AND
-            date IS NOT NULL
-    )
+WITH ranked_predictions AS (
     SELECT 
         company,
         model_name,
         true_value,
         predicted_value,
-        date,
-        ROUND(mape, 3) AS mape,
-        ROUND(mae, 3) as mae
+        DATE(date) AS date,  -- Ensure TIMESTAMP is cast to DATE
+        -- Mean Absolute Percentage Error (MAPE)
+        CASE 
+            WHEN true_value != 0 THEN ABS((true_value - predicted_value) / true_value) * 100
+            ELSE NULL  -- Handle division by zero
+        END AS mape,
+        -- Mean Absolute Error (MAE)
+        ABS(true_value - predicted_value) AS mae,
+        ROW_NUMBER() OVER (PARTITION BY model_name ORDER BY date DESC) AS rn
     FROM 
-        ranked_predictions
-    WHERE 
-        rn = 1;
+        `tomastestproject-433206.testdb_1.predictions`
+    WHERE
+        company IS NOT NULL AND
+        model_name IS NOT NULL AND
+        true_value IS NOT NULL AND
+        predicted_value IS NOT NULL AND
+        date IS NOT NULL
+)
+SELECT 
+    rp.company,
+    rp.model_name,
+    rp.true_value,
+    rp.predicted_value,
+    rp.date,
+    ROUND(rp.mape, 3) AS mape,
+    ROUND(rp.mae, 3) AS mae,
+    asd.pub_date,
+    asd.close  -- Replace with specific columns from avg_scores_and_stock_data_right
+FROM 
+    ranked_predictions rp
+JOIN 
+    `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right` asd
+ON 
+    rp.company = asd.company  -- Match by company
+    AND asd.pub_date = DATE_SUB(rp.date, INTERVAL 1 DAY)  -- Match where pub_date is 1 day before ranked_predictions.date
+WHERE 
+    rp.rn = 1;
+
         """
 
     # Execute the SQL query
@@ -124,10 +132,11 @@ def dashboard():
         # Extract details of the latest model
     if not filtered_df.empty:
         latest_model_name = filtered_df.iloc[0]['model_name']
-        latest_date = filtered_df.iloc[0]['date'].date()
-        latest_prediction = round(filtered_df.iloc[0]['predicted_value'], 2)
-        latest_true_value = round(filtered_df.iloc[0]['true_value'], 2)
-        difference_price = round(latest_true_value - latest_prediction, 2)
+        latest_date = filtered_df.iloc[0]['date']
+        latest_prediction = round(filtered_df.iloc[0]['predicted_value'], 3)
+        latest_true_value = round(filtered_df.iloc[0]['true_value'], 3)
+        difference_price = round(latest_true_value - latest_prediction, 3)
+        closing_price = round(filtered_df.iloc[0]['close'], 3)
     else:
         # Handle case where there is no data for the selected company
         latest_model_name = "No data"
@@ -136,23 +145,49 @@ def dashboard():
         latest_true_value = 0
         difference_price = 0
 
+    if latest_prediction > closing_price and latest_true_value > closing_price:
+        prediction_value = 'Correct'
+    elif latest_prediction < closing_price and latest_true_value < closing_price:
+        prediction_value = 'Correct'
+    else:
+        prediction_value = 'Incorrect'
+
+    if latest_prediction > closing_price:
+        prediction_direction = '🚀'
+    elif latest_prediction < closing_price:
+        prediction_direction = '📉'
 
 
-    # Example data for the graph
+    # Extract data from filtered_df
+    dates = filtered_df['date']
+    predicted_values = filtered_df['predicted_value']
+    true_values = filtered_df['true_value']
+
+    # Create the graph data
     data = [
         go.Scatter(
-            x=[1, 2, 3, 4],
-            y=[10, 11, 12, 13],
+            x=dates,
+            y=predicted_values,
             mode='lines+markers',
-            name='Example'
+            name='Predicted Value'
+        ),
+        go.Scatter(
+            x=dates,
+            y=true_values,
+            mode='lines+markers',
+            name='True Value'
         )
     ]
+
     # Convert the figure to JSON
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
 
 
-    return render_template('index.html', 
+    return render_template('index.html',
+                           closing_price=closing_price,
+                           prediction_direction=prediction_direction,
+                           prediction_value=prediction_value,
                            selected_option=selected_option,
                            latest_model_name=latest_model_name, 
                            latest_date=latest_date, 

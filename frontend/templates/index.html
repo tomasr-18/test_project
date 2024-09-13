@@ -44,12 +44,12 @@
                     </div>
                 </div>
             </div>
-            <div class="stat" id="latest-run" style="background-color: #ffcb77;">
+            <div class="stat" id="latest-run" style="background-color: #17c3b2;">
                 <div class="stat-container">
                     <h3>Prediction</h3>
                     <div class="stat-info">
-                        <p>Price</p>
-                        <h2 id="stat-value">{{prediction}} $</h2>
+                        <p>{{closing_price}} $</p>
+                        <h2 id="stat-value">{{prediction}} $ - {{prediction_direction}} </h2>
                     </div>
                 </div>
             </div>
@@ -62,12 +62,16 @@
                     </div>
                 </div>
             </div>
-            <div class="stat" id="latest-run" style="background-color: #fe6d73;">
+            <div class="stat" id="latest-run" {% if prediction_value == 'Correct' %} 
+            style="background-color: #04e762;" 
+        {% else %} 
+            style="background-color: #f21b3f;" 
+        {% endif %}>
                 <div class="stat-container">
-                    <h3>Difference</h3>
+                    <h3>Prediction Result</h3>
                     <div class="stat-info">
-                        <p>Price</p>
-                        <h2 id="stat-value">{{difference_price}} $</h2>
+                        <p>Value</p>
+                        <h2 id="stat-value">{{prediction_value}}</h2>
                     </div>
                 </div>
             </div>
@@ -81,6 +85,7 @@
                               <th scope="col">Model name</th>
                               <th scope="col">MAE</th>
                               <th scope="col">MAPE</th>
+                              
                             </tr>
                           </thead>
                         {% for model in models %}
@@ -88,6 +93,7 @@
                             <td>{{ model.model_name }}</td>
                             <td>{{ model.mae }}</td>
                             <td>{{ model.mape }}%</td>
+                            
                         </tr>
                         {% endfor %}
                     </table>
