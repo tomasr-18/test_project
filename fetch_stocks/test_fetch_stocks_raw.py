@@ -39,7 +39,9 @@ class TestFetchStocksRaw(unittest.TestCase):
         # Mock the secret and BigQuery client
         mock_get_secret.return_value = '{"type": "service_account"}'
         mock_client_instance = mock_bigquery_client.return_value
-        mock_client_instance.insert_rows_json.return_value = []
+        mock_client_instance.create_dataset.return_value = None  # Simulate successful dataset creation
+        mock_client_instance.table.return_value.exists.return_value = True  # Simulate existing table
+        mock_client_instance.insert_rows_json.return_value = []  # Simulate successful data insertion
 
         stock_data = {"Time Series (Daily)": {"2023-01-01": {"1. open": "100.0"}}}
         response = save_raw_stock_data('AAPL', stock_data, 'mock_table_id')
@@ -60,5 +62,4 @@ class TestFetchStocksRaw(unittest.TestCase):
         self.assertIn("Rows successfully inserted.", response_content["message"])
 
 if __name__ == "__main__":
-    #unittest.main()
-    pass
+    unittest.main()
