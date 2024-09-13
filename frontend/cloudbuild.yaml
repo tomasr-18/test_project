@@ -1,13 +1,11 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img', '-f', 'frontend/dockerfile', 'frontend']
-
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/frontend-img', '-f', 'frontend/Dockerfile', 'frontend']
 - name: 'gcr.io/cloud-builders/docker'        
-  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img']
-
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/frontend-img']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'frontend', 
-          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img',
+          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/frontend-img',
           '--platform', 'managed',
           '--region', 'europe-west1']
 
@@ -15,4 +13,4 @@ options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
   logging: CLOUD_LOGGING_ONLY
 
-serviceAccount: 'service-accout-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
+serviceAccount: 'service-account-bigquery@tomastestproject-433206.iam.gserviceaccount.com'
