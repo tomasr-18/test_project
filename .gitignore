@@ -22,8 +22,8 @@ clean_stocks_copy.py
 
 
 
-
-
+fetch_stocks/__pycache__
+transform_news_2/__pycache__
 test_clean_news.py
 /ml_model/ml-model
 /ml_model/credentials

@@ -1,5 +1,5 @@
 name: Lint and Test
-
+ 
 on:
   push:
     branches:
@@ -7,29 +7,42 @@ on:
   pull_request:
     branches:
       - main
-
+ 
 jobs:
   lint_and_test:
     runs-on: ubuntu-latest
-
+ 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
+ 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-
+ 
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
         pip install ruff
-
+ 
     - name: Run Ruff Linting
       run: |
         ruff check . --config pyproject.toml
-
+ 
+    - name: Set up Google Cloud credentials
+      # Save the Google Cloud credentials (from GitHub Secrets) to a JSON file
+      run: |
+        echo "${{ secrets.BIG_QUERY_SECRET }}" > $HOME/gcloud.json
+      # Make sure the secret is properly configured for future commands
+      env:
+        GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
+ 
+    - name: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
+      # Set the environment variable to the path of the credentials file
+      run: |
+        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
+ 
     - name: Run Tests
       run: |
         # Check if there are any test files before running pytest
@@ -39,3 +52,5 @@ jobs:
         else
           echo "No test files found, skipping tests."
         fi
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud.json
