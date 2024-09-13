@@ -35,7 +35,6 @@ jobs:
       env:
         NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       run: |
-        # Export the NEWS_API_KEY to make it available in subsequent steps
         echo "NEWS_API_KEY=${NEWS_API_KEY}" >> $GITHUB_ENV
 
     - name: Run Tests
