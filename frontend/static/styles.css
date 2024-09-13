@@ -89,7 +89,7 @@ body{
 }
 
 .dash-container table thead {
-    background-color: #018CF1;
+    background-color: #2891db;
     color: white;
     height: 40px;
 }
@@ -131,7 +131,6 @@ body{
     justify-content: center;
     align-items: center;
 }
-
 
 
 .topbar-stats{

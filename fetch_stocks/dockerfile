@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8080
 
 # Command to run the application
-CMD ["uvicorn", "fetch_stocks_raw:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]

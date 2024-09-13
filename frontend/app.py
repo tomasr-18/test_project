@@ -1,8 +1,8 @@
-import datetime
 from flask import Flask, render_template, request
 import plotly.express as px
 import plotly.graph_objs as go
 import json
+import pandas as pd
 import plotly
 from google.cloud import secretmanager, bigquery
 
@@ -31,7 +31,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
 
     return secret_data
 
-def get_data_from_bigquery():
+def get_data_from_bigquery() -> pd.DataFrame:
 
     secret_data = get_secret()
 
@@ -113,10 +113,10 @@ def dashboard():
         selected_option = 'AAPL'  # Default selected option
     
     df = get_data_from_bigquery()
-    models = df.to_dict(orient='records')
 
     # Filter the data to only include the selected company
     filtered_df = df[df['company'] == selected_option]
+    models = filtered_df.to_dict(orient='records')
 
     # Sort the data by date to get the latest model
     filtered_df = filtered_df.sort_values(by='date', ascending=False)
