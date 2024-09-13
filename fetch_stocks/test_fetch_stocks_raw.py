@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from fetch_stocks_raw import app, get_secret, fetch_raw_stock_data, save_raw_stock_data
 import json
-import httpx
+#import httpx
 
 client = TestClient(app)
 
