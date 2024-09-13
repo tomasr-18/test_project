@@ -19,7 +19,7 @@ fetch_stocks_raw2.py
 fetch_stocks_raw_notebook.ipynb
 fixing.py
 clean_stocks_copy.py
-
+test_fetch_stocks_raw.py
 
 
 fetch_stocks/__pycache__
