@@ -41,7 +41,7 @@ def get_data_from_bigquery() -> pd.DataFrame:
     client = bigquery.Client.from_service_account_info(service_account_info)
 
     # Build your SQL query
-    query = f"""
+    query = """
 WITH ranked_predictions AS (
     SELECT 
         company,
