@@ -245,13 +245,12 @@ def transfer_ids_to_meta_data(table_from:str,
                               table_to:str, 
                               project_id:str, 
                               dataset:str, 
-                              secret:str
                               ):
     try:
         # Initiera BigQuery-klienten
 
         # Hämta JSON-sträng från Secret Manager
-        secret_data = get_secret(secret)
+        secret_data = get_secret()
 
         # Ladda JSON-strängen till en dictionary
         service_account_info = json.loads(secret_data)
