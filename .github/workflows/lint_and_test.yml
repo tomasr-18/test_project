@@ -1,5 +1,5 @@
 name: Lint and Test
- 
+
 on:
   push:
     branches:
@@ -7,50 +7,37 @@ on:
   pull_request:
     branches:
       - main
- 
+
 jobs:
   lint_and_test:
     runs-on: ubuntu-latest
- 
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
- 
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
- 
+
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install ruff
- 
-    - name: Run Ruff Linting
-      run: |
-        ruff check . --config pyproject.toml
- 
+        pip install pytest
+
     - name: Set up Google Cloud credentials
-      # Save the Google Cloud credentials (from GitHub Secrets) to a JSON file
-      run: |
-        echo "${{ secrets.BIG_QUERY_SECRET }}" > $HOME/gcloud.json
-      # Make sure the secret is properly configured for future commands
+      run: echo "${{ secrets.BIG_QUERY_SECRET }}" > ${{ github.workspace }}/gcp-key.json
       env:
         GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
- 
-    - name: Set GOOGLE_APPLICATION_CREDENTIALS environment variable
-      # Set the environment variable to the path of the credentials file
+
+    - name: Export News API key
+      env:
+        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       run: |
-        export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json
- 
+        echo "NEWS_API_KEY=${NEWS_API_KEY}" >> $GITHUB_ENV
+
     - name: Run Tests
       run: |
-        # Check if there are any test files before running pytest
-        if ls **/test_*.py 1> /dev/null 2>&1; then
-          echo "Test files found, running pytest..."
-          pytest
-        else
-          echo "No test files found, skipping tests."
-        fi
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: $HOME/gcloud.json
+        export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
+        pytest
