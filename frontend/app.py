@@ -15,17 +15,17 @@ def get_secret(secret_name="bigquery-accout-secret") -> str:
     Returns:
         str: The secret data as a string.
     """
-    # Instansiera en klient för Secret Manager
+    # Insantiate a Secret Manager client
     client = secretmanager.SecretManagerServiceClient()
 
-    # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = "tomastestproject-433206"  # Ersätt med ditt projekt-ID
+    # Set the secret path
+    project_id = "tomastestproject-433206" 
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
-    # Hämta den senaste versionen av hemligheten
+    # Access the secret version
     response = client.access_secret_version(name=secret_path)
 
-    # Dekoda hemligheten till en sträng
+    # decode the secret data
     secret_data = response.payload.data.decode("UTF-8")
 
     return secret_data
@@ -34,13 +34,13 @@ def get_secret(secret_name="bigquery-accout-secret") -> str:
 def get_data_from_bigquery() -> pd.DataFrame:
     secret_data = get_secret()
 
-    # Ladda JSON-strängen till en dictionary
+    # Load the json data into a dictionary
     service_account_info = json.loads(secret_data)
 
-    # Initiera BigQuery-klienten med service account
+    # Initialize a BigQuery client
     client = bigquery.Client.from_service_account_info(service_account_info)
 
-    # Build your SQL query
+    # Query to fetch the latest predictions and stock data
     query = """
 WITH ranked_predictions AS (
     SELECT 
@@ -75,7 +75,7 @@ SELECT
     ROUND(rp.mape, 3) AS mape,
     ROUND(rp.mae, 3) AS mae,
     asd.pub_date,
-    asd.close  -- Replace with specific columns from avg_scores_and_stock_data_right
+    asd.close  -- Closing price
 FROM 
     ranked_predictions rp
 JOIN 
