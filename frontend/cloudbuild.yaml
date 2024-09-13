@@ -1,13 +1,13 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend', '-f', 'frontend/dockerfile', 'frontend']
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img', '-f', 'frontend/dockerfile', 'frontend']
 
 - name: 'gcr.io/cloud-builders/docker'        
-  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend']
-  
+  args: ['push', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img']
+
 - name: 'gcr.io/cloud-builders/gcloud'
   args: ['run', 'deploy', 'frontend', 
-          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend',
+          '--image', 'europe-west1-docker.pkg.dev/tomastestproject-433206/frontend/dashboard-img',
           '--platform', 'managed',
           '--region', 'europe-west1']
 
