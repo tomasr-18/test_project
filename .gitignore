@@ -30,4 +30,3 @@ test_clean_news.py
 /ml_model/.env
 
 /frontend/frontend
-load_env.py
