@@ -3,14 +3,14 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from fetch_stocks_raw import app, get_secret, fetch_raw_stock_data, save_raw_stock_data
 import json
-#import httpx
 
 client = TestClient(app)
 
 class TestFetchStocksRaw(unittest.TestCase):
 
+    @patch('google.auth.default', return_value=(None, None))  # Mock google.auth.default
     @patch('fetch_stocks_raw.secretmanager.SecretManagerServiceClient')
-    def test_get_secret(self, mock_secret_manager_client):
+    def test_get_secret(self, mock_secret_manager_client, mock_google_auth):
         # Mock the secret manager client
         mock_client_instance = mock_secret_manager_client.return_value
         mock_client_instance.access_secret_version.return_value.payload.data.decode.return_value = 'mock_secret'
