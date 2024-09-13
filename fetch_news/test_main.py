@@ -12,7 +12,7 @@ client = TestClient(app)
 def setup_environment():
     # Set environment variables from GitHub Actions secrets
     # Path to the JSON key file
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/path/to/your/gcp-key.json"
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "gcp-key.json"
     # Replace with your API key from GitHub secrets
     os.environ["NEWS_API_KEY"] = os.getenv("NEWS_API_KEY")
 
