@@ -2,8 +2,8 @@
 import os
 import pytest
 from fastapi.testclient import TestClient
-from main import app, fetch_news_and_save
-from unittest.mock import patch, MagicMock
+from main import app
+from unittest.mock import patch
 
 client = TestClient(app)
 
