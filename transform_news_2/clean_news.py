@@ -4,6 +4,19 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from google.cloud import secretmanager
 import json
 from google.api_core.exceptions import GoogleAPIError, NotFound
+import os
+from google.auth import default
+
+
+def get_project_id():
+    """Retrieve project ID either from environment or default credentials."""
+    # First, check if the GOOGLE_CLOUD_PROJECT env var is set
+    project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
+
+    if not project_id:
+        # If not set, retrieve the project ID from default credentials
+        _, project_id = default()
+    return project_id
 
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
@@ -18,7 +31,7 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     client = secretmanager.SecretManagerServiceClient()
 
     # Bygg sökvägen till den hemlighet du vill hämta
-    project_id = 'tomastestproject-433206'  # Ersätt med ditt projekt-ID
+    project_id = get_project_id()  # Ersätt med ditt projekt-ID
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
 
     # Hämta den senaste versionen av hemligheten
@@ -30,10 +43,11 @@ def get_secret(secret_name='bigquery-accout-secret') -> str:
     return secret_data
 
 
-def get_raw_news_from_big_query(raw_data_table='raw_news_data',
-                                meta_data_table='raw_news_meta_data', 
-                                project_id='tomastestproject-433206', 
-                                dataset='testdb_1'):
+def get_raw_news_from_big_query(raw_data_table:str,
+                                meta_data_table:str, 
+                                project_id:str, 
+                                dataset:str
+                                ):
     """
     Fetches unprocessed raw news data from a specified BigQuery table and returns it as a pandas DataFrame 
     along with a string of row IDs that were used.
@@ -96,9 +110,9 @@ def get_raw_news_from_big_query(raw_data_table='raw_news_data',
 
 
 def update_is_processed(id_string: str,
-                        table='raw_news_meta_data', 
-                        project_id='tomastestproject-433206', 
-                        dataset='testdb_1'):
+                        table:str, 
+                        project_id:str, 
+                        dataset:str):
 
     table_id = f"{project_id}.{dataset}.{table}"
     secret_data = get_secret()
@@ -227,11 +241,11 @@ def write_clean_news_to_bq(data: pd.DataFrame,
         return f'{job.output_rows} rader sparades till {table}'
 
 
-def transfer_ids_to_meta_data(table_from='raw_news_data', 
-                              table_to='raw_news_meta_data', 
-                              project_id='tomastestproject-433206', 
-                              dataset='testdb_1', 
-                              secret='bigquery-accout-secret'
+def transfer_ids_to_meta_data(table_from:str, 
+                              table_to:str, 
+                              project_id:str, 
+                              dataset:str, 
+                              secret:str
                               ):
     try:
         # Initiera BigQuery-klienten
@@ -278,33 +292,3 @@ def transfer_ids_to_meta_data(table_from='raw_news_data',
         print(f"An unexpected error occurred: {e}")
         raise
 
-def make_table(table_name='clean_news', project_id='tomastestproject-433206', database='testdb_1'):
-    """
-    Creates table for cleaned news in Big Query.
-    """
-    # Initiera BigQuery-klienten
-    client = bigquery.Client.from_service_account_json(
-        '/Users/tomasrydenstam/Desktop/Skola/test_project/transform_news/tomastestproject-433206-adc5bc090976.json'
-    )
-
-    table_id = f"{project_id}.{database}.{table_name}"
-
-    # Definiera schema med uppdaterat kolumnnamn
-    schema = [
-        bigquery.SchemaField("author", "STRING"),
-        bigquery.SchemaField("description", "STRING"),
-        bigquery.SchemaField("pub_date", "TIMESTAMP"),
-        bigquery.SchemaField("title", "STRING"),
-        bigquery.SchemaField("url", "STRING"),
-        bigquery.SchemaField("source_name", "STRING"),  # Uppdaterat kolumnnamn
-        bigquery.SchemaField("company", "STRING"),
-        bigquery.SchemaField("score_description", "FLOAT"),
-        bigquery.SchemaField("score_title", "FLOAT"),
-    ]
-
-    # Skapa en Tabellreferens
-    table = bigquery.Table(table_id, schema=schema)
-
-    # Skapa Tabell
-    table = client.create_table(table)  # Här skapas tabellen med table-objektet
-    print(f"Created table {table_id}")
