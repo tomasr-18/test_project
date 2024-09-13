@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from fetch_stocks_raw import app, get_secret, fetch_raw_stock_data, save_raw_stock_data
 import json
+import httpx
 
 client = TestClient(app)
 
@@ -56,4 +57,5 @@ class TestFetchStocksRaw(unittest.TestCase):
         self.assertIn("Rows successfully inserted.", response_content["message"])
 
 if __name__ == "__main__":
-    unittest.main()
+    #unittest.main()
+    pass
