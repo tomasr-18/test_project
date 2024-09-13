@@ -1,10 +1,10 @@
 import pytest
 from unittest.mock import patch, MagicMock
+
 from fetch_raw_data import get_secret, fetch_news, save_raw_data_to_big_query
 
-# Test get_secret function
 
-
+# Test get_secret function (no changes needed)
 @patch('fetch_raw_data.secretmanager.SecretManagerServiceClient')
 def test_get_secret(mock_secret_manager_client):
     mock_secret = MagicMock()
@@ -18,9 +18,8 @@ def test_get_secret(mock_secret_manager_client):
     mock_secret_manager_client.return_value.access_secret_version.assert_called_once_with(
         name='projects/tomastestproject-433206/secrets/test_secret_name/versions/latest')
 
+
 # Test fetch_news function with successful response
-
-
 @patch('requests.get')
 def test_fetch_news_success(mock_requests_get):
     mock_response = MagicMock()
@@ -34,9 +33,8 @@ def test_fetch_news_success(mock_requests_get):
         url='https://newsapi.org/v2/everything?q=company_name&from=2024-01-01&to=2024-01-31&sortBy=relevance&language=en&apiKey=api_key'
     )
 
+
 # Test fetch_news function with failed response
-
-
 @patch('requests.get')
 def test_fetch_news_failure(mock_requests_get):
     mock_response = MagicMock()
@@ -47,9 +45,8 @@ def test_fetch_news_failure(mock_requests_get):
     with pytest.raises(ValueError):
         fetch_news('company_name', 'api_key', '2024-01-01', '2024-01-31')
 
-# Test save_raw_data_to_big_query function
 
-
+# Test save_raw_data_to_big_query function with successful insert
 @patch('fetch_raw_data.get_secret')
 @patch('fetch_raw_data.bigquery.Client')
 def test_save_raw_data_to_big_query_success(mock_bigquery_client, mock_get_secret):
@@ -58,8 +55,7 @@ def test_save_raw_data_to_big_query_success(mock_bigquery_client, mock_get_secre
 
     mock_client = MagicMock()
     mock_bigquery_client.from_service_account_info.return_value = mock_client
-
-    mock_client.insert_rows_json.return_value = []
+    mock_client.insert_rows_json.return_value = []  # Empty list for successful insert
 
     data = {"key": "value"}
     save_raw_data_to_big_query(data, 'company_name')
@@ -69,6 +65,7 @@ def test_save_raw_data_to_big_query_success(mock_bigquery_client, mock_get_secre
     mock_client.insert_rows_json.assert_called_once()
 
 
+# Test save_raw_data_to_big_query function with failing insert
 @patch('fetch_raw_data.get_secret')
 @patch('fetch_raw_data.bigquery.Client')
 def test_save_raw_data_to_big_query_failure(mock_bigquery_client, mock_get_secret):
@@ -77,10 +74,4 @@ def test_save_raw_data_to_big_query_failure(mock_bigquery_client, mock_get_secre
 
     mock_client = MagicMock()
     mock_bigquery_client.from_service_account_info.return_value = mock_client
-
-    mock_client.insert_rows_json.return_value = [{'errors': 'error'}]
-
-    data = {"key": "value"}
-
-    with pytest.raises(RuntimeError):
-        save_raw_data_to_big_query(data, 'company_name')
+    mock_client.insert

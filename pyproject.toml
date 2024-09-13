@@ -1,7 +1,7 @@
 [tool.ruff]
 exclude = ["transform_stocks/",
             "fetch_stocks_raw/",
-            "transform_news_2/",
+ 
             "fetch_stocks_raw/",
             "fetch_stocks_raw/fetch_stocks_raw.py",
             "fetch_stocks_raw/fetch_stocks_raw_daily.ipynb",
