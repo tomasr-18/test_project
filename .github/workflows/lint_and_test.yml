@@ -1,47 +1,71 @@
 name: Lint and Test
-
+ 
 on:
+
   push:
+
     branches:
+
       - main
+
   pull_request:
+
     branches:
+
       - main
-
+ 
 jobs:
+
   lint_and_test:
+
     runs-on: ubuntu-latest
-
+ 
     steps:
+
     - name: Checkout code
+
       uses: actions/checkout@v3
-
+ 
     - name: Set up Python
+
       uses: actions/setup-python@v4
+
       with:
+
         python-version: '3.9'
-
+ 
     - name: Install dependencies
+
       run: |
+
         pip install -r requirements.txt
+
         pip install pytest
-
+ 
     - name: Set up Google Cloud credentials
+
       run: echo "${{ secrets.BIG_QUERY_SECRET }}" > ${{ github.workspace }}/gcp-key.json
+
       env:
+
         GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
-
+ 
     - name: Set up News API key
+
       run: echo "${{ secrets.NEWS_API_KEY }}" > ${{ github.workspace }}/news-api-key.txt
+
       env:
+
         NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-
-    - name: Print News API key
-      # This will print the API key to the console. Be cautious with this step in production environments.
-      run: echo "NEWS_API_KEY=${{ secrets.NEWS_API_KEY }}"
-
+ 
     - name: Run Tests
+
       run: |
+
         export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
+
         export NEWS_API_KEY=$(cat ${{ github.workspace }}/news-api-key.txt)
+
         pytest
+
+ 
