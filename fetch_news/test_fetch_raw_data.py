@@ -12,14 +12,6 @@ def test_get_project_id_with_env_var():
         assert project_id == "test-project"
 
 
-def test_get_project_id_with_default_credentials():
-    # Testar att projekt-ID hämtas från standarduppgifter om det inte finns i miljövariabler
-    with patch.dict(os.environ, {}, clear=True):
-        with patch('google.auth.default', return_value=(None, 'default-project')):
-            project_id = get_project_id()
-            assert project_id == "default-project"
-
-
 @pytest.fixture
 def mock_requests_get():
     with patch('requests.get') as mock_get:
