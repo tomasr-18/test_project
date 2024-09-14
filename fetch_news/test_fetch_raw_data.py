@@ -1,77 +1,73 @@
+import os
 import pytest
-from unittest.mock import patch, MagicMock
-
-from fetch_raw_data import get_secret, fetch_news, save_raw_data_to_big_query
-
-
-# Test get_secret function (no changes needed)
-@patch('fetch_raw_data.secretmanager.SecretManagerServiceClient')
-def test_get_secret(mock_secret_manager_client):
-    mock_secret = MagicMock()
-    mock_secret.payload.data.decode.return_value = 'test_secret'
-    mock_secret_manager_client.return_value.access_secret_version.return_value = mock_secret
-
-    secret = get_secret('test_secret_name')
-
-    assert secret == 'test_secret'
-    mock_secret_manager_client.assert_called_once()
-    mock_secret_manager_client.return_value.access_secret_version.assert_called_once_with(
-        name='projects/tomastestproject-433206/secrets/test_secret_name/versions/latest')
+from unittest.mock import patch, Mock
+from fetch_raw_data import get_project_id, fetch_news
+import requests
 
 
-# Test fetch_news function with successful response
-@patch('requests.get')
+def test_get_project_id_with_env_var():
+    # Testar att projekt-ID hämtas korrekt från miljövariabler
+    with patch.dict(os.environ, {"GOOGLE_CLOUD_PROJECT": "test-project"}):
+        project_id = get_project_id()
+        assert project_id == "test-project"
+
+
+@pytest.fixture
+def mock_requests_get():
+    with patch('requests.get') as mock_get:
+        yield mock_get
+
+
 def test_fetch_news_success(mock_requests_get):
-    mock_response = MagicMock()
-    mock_response.json.return_value = {"status": "ok", "articles": []}
+    # Mockar ett lyckat API-svar
+    mock_response = Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {
+        "status": "ok",
+        "articles": [{"title": "Test Article", "description": "Test Description"}]
+    }
     mock_requests_get.return_value = mock_response
 
-    result = fetch_news('company_name', 'api_key', '2024-01-01', '2024-01-31')
-
-    assert result == {"status": "ok", "articles": []}
-    mock_requests_get.assert_called_once_with(
-        url='https://newsapi.org/v2/everything?q=company_name&from=2024-01-01&to=2024-01-31&sortBy=relevance&language=en&apiKey=api_key'
+    result = fetch_news(
+        company="Test Company",
+        api_key="fake-api-key",
+        from_date="2023-01-01",
+        to_date="2023-01-02"
     )
 
+    assert result["status"] == "ok"
+    assert len(result["articles"]) == 1
+    assert result["articles"][0]["title"] == "Test Article"
 
-# Test fetch_news function with failed response
-@patch('requests.get')
-def test_fetch_news_failure(mock_requests_get):
-    mock_response = MagicMock()
+
+def test_fetch_news_api_error(mock_requests_get):
+    # Mockar ett API-svar med fel
+    mock_response = Mock()
+    mock_response.status_code = 200
     mock_response.json.return_value = {
-        "status": "error", "message": "error_message"}
+        "status": "error",
+        "message": "API Key invalid."
+    }
     mock_requests_get.return_value = mock_response
 
-    with pytest.raises(ValueError):
-        fetch_news('company_name', 'api_key', '2024-01-01', '2024-01-31')
+    with pytest.raises(ValueError, match="API Error: API Key invalid."):
+        fetch_news(
+            company="Test Company",
+            api_key="fake-api-key",
+            from_date="2023-01-01",
+            to_date="2023-01-02"
+        )
 
 
-# Test save_raw_data_to_big_query function with successful insert
-@patch('fetch_raw_data.get_secret')
-@patch('fetch_raw_data.bigquery.Client')
-def test_save_raw_data_to_big_query_success(mock_bigquery_client, mock_get_secret):
-    mock_secret = '{"private_key": "key"}'
-    mock_get_secret.return_value = mock_secret
+def test_fetch_news_network_error(mock_requests_get):
+    # Simulerar ett nätverksfel
+    mock_requests_get.side_effect = requests.exceptions.RequestException(
+        "Network error")
 
-    mock_client = MagicMock()
-    mock_bigquery_client.from_service_account_info.return_value = mock_client
-    mock_client.insert_rows_json.return_value = []  # Empty list for successful insert
-
-    data = {"key": "value"}
-    save_raw_data_to_big_query(data, 'company_name')
-
-    mock_get_secret.assert_called_once_with('bigquery-accout-secret')
-    mock_bigquery_client.from_service_account_info.assert_called_once()
-    mock_client.insert_rows_json.assert_called_once()
-
-
-# Test save_raw_data_to_big_query function with failing insert
-@patch('fetch_raw_data.get_secret')
-@patch('fetch_raw_data.bigquery.Client')
-def test_save_raw_data_to_big_query_failure(mock_bigquery_client, mock_get_secret):
-    mock_secret = '{"private_key": "key"}'
-    mock_get_secret.return_value = mock_secret
-
-    mock_client = MagicMock()
-    mock_bigquery_client.from_service_account_info.return_value = mock_client
-    mock_client.insert
+    with pytest.raises(requests.exceptions.RequestException, match="Network error"):
+        fetch_news(
+            company="Test Company",
+            api_key="fake-api-key",
+            from_date="2023-01-01",
+            to_date="2023-01-02"
+        )

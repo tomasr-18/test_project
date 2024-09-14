@@ -1,0 +1,207 @@
+body{
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    background-color: #f1f1f1;
+    font-family: Oxygen, sans-serif;
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+.container{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header{
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+    height: 80px;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header h2{
+    color: #333;
+}
+
+.header img {
+    height: 80px;
+}
+
+.main{
+    box-sizing: border-box;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* same as 1fr 1fr 1fr */
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    padding: 20px 30px;
+}
+
+.dash-container{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    border-radius: 20px;
+    background-color: #fff  ;  
+    height: 400px;
+    overflow: hidden;
+}
+
+.table-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.table-container::-webkit-scrollbar {
+    display: none;  /* Hide scrollbar in WebKit browsers (Chrome, Safari) */
+}
+
+
+.dash-container table {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    border-collapse: collapse; /* Ensure borders are collapsed */
+    border-spacing: 0;;
+    border: none;
+}
+
+.dash-container table thead {
+    background-color: #2891db;
+    color: white;
+    height: 40px;
+}
+
+.dash-container table tbody {
+    overflow-y: scroll;
+}
+
+.dash-container table td {
+    padding: 10px; /* Add padding to table cells */
+    border: 1px solid #ddd; /* Add border to table cells */
+}
+
+.dash-container table tr{
+    min-height: 20px;
+}
+
+.dash-container table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Add background color to even rows */
+}
+
+.dash-container table tbody tr:hover {
+    background-color: #ddd; /* Add hover effect to rows */
+}
+
+
+#plotly-graph{
+    width: 100%;
+    height: 100%;
+}
+
+#model-table {
+    grid-column: 1 / 2; /* Occupy the first column */
+}
+
+#stocks {
+    grid-column: 2 / 2; /* Occupy the second column */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.topbar-stats{
+    box-sizing: border-box;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* same as 1fr 1fr 1fr */
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    padding: 30px 30px 0 30px;
+    color: white;
+}
+
+
+.stat {
+    border-radius: 20px;
+    height: 120px;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.stat-container{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.stat-container h3 {
+    margin: 0;
+}
+
+.stat-info{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+.stat-info #stat-value, .stat-info p {
+    margin: 0;
+}
+
+.stat-info p {
+    color: #ffffff7c;
+}
+
+.stat-info #stat-value {
+    font-size: 1.5em;
+    text-align: start;
+    width: 100%;
+}
+
+
+#dropdown{
+    font-size: 1.5em;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    color: white;
+}
+
+#dropdown option{
+    background-color: #17c3b2;
+    border: none;
+}

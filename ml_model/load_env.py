@@ -2,7 +2,7 @@ import os
 from google.cloud import secretmanager
 
 
-def load_env_from_secret(secret_name:str, project_id:str):
+def load_env_from_secret(secret_name: str, project_id: str):
     # Skapa en klient för Secret Manager
     client = secretmanager.SecretManagerServiceClient()
 
