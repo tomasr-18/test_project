@@ -63,7 +63,7 @@ def clean_news_endpoint(request: NewsRequest):
         # Skriv de rensade nyheterna till BigQuery och få antalet rader som skrevs
         rows_written = write_clean_news_to_bq(data=cleaned_df,table=request.write_table)
 
-        update_is_processed(id_string=ids, table=request.meta_data_table)
+        update_is_processed(id_string=ids, table=request.meta_data_table,project_id=request.project_id,dataset=request.dataset)
 
         # Returnera resultat som JSON
         return {"message": "Data cleaned and written to BigQuery successfully.", "rows_written": rows_written}
