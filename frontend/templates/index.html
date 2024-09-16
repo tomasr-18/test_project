@@ -101,14 +101,34 @@
                 </div>
             </div>
             <div class="dash-container" id="stocks">
+                
+                    <select id="graph-selector">
+                        <option value="graph1">Predictions</option>
+                        <option value="graph2">Sentiment</option>
+                    </select>
+                
                 <div id="plotly-graph"></div>
             </div>
         </div>
 
     </div>
     <script>
-        var graph = {{ graphJSON | safe }};
-        Plotly.newPlot('plotly-graph', graph);
+        var graphs = {
+            graph1: {{ graphJSON1 | safe }},
+            graph2: {{ graphJSON2 | safe }},
+            // Add more graphs as needed
+        };
+    
+        function updateGraph(selectedGraph) {
+            Plotly.react('plotly-graph', graphs[selectedGraph]);
+        }
+    
+        document.getElementById('graph-selector').addEventListener('change', function() {
+            updateGraph(this.value);
+        });
+    
+        // Initialize with the first graph
+        updateGraph('graph1');
     </script>
 </body>
 </html>

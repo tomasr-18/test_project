@@ -50,6 +50,7 @@ body{
     box-sizing: border-box;
     width: 100%;
     display: grid;
+    justify-content: flex-start;
     grid-template-columns: 1fr 2fr; /* same as 1fr 1fr 1fr */
     grid-template-rows: repeat(3, 1fr);
     grid-column-gap: 20px;
@@ -60,11 +61,21 @@ body{
 .dash-container{
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: flex-start;
     border-radius: 20px;
     background-color: #fff  ;  
     height: 400px;
     overflow: hidden;
+}
+
+#graph-selector{
+    font-size: 1em;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    color: black;
 }
 
 .table-container {
