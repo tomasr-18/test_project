@@ -26,12 +26,11 @@ jobs:
         pip install -r requirements.txt
         pip install pytest
 
-    - name: Set up Google Cloud credentials
-      run: echo "${{ secrets.BIG_QUERY_SECRET }}" > ${{ github.workspace }}/gcp-key.json
-      env:
-        GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.BIG_QUERY_SECRET }}  # Your service account key secret
 
-    - name: Run Tests
+    - name: Run tests
       run: |
-        export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
-        pytest
+        pytest  
