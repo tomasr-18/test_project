@@ -33,6 +33,9 @@ jobs:
       env:
         GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
 
+    - name: Debug JSON content
+      run: cat ${{ github.workspace }}/gcp-key.json
+
     - name: Run Tests
       run: |
         export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
