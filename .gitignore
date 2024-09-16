@@ -20,7 +20,7 @@ fetch_stocks_raw_notebook.ipynb
 fixing.py
 clean_stocks_copy.py
 test_fetch_stocks_raw.py
-
+fetch_news/__pycache__
 
 fetch_stocks/__pycache__
 transform_news_2/__pycache__
