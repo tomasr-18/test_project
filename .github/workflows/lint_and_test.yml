@@ -31,9 +31,8 @@ jobs:
         with:
           credentials_json: '${{ secrets.BIG_QUERY_SECRET }}'  # Use stored GCP credentials
  
-      - name: Run BigQuery Tests
+      - name: Run Test
         env:
           PROJECT_ID: ${{ secrets.BIG_QUERY_SECRET }}  # Use your GCP project ID stored in secrets
         run: |
-          pytest
- 
+          pytest -p no:warnings
