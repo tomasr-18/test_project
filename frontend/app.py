@@ -67,6 +67,7 @@ WITH ranked_predictions AS (
         date IS NOT NULL
 )
 SELECT 
+    asd.avg_score_title,
     rp.company,
     rp.model_name,
     rp.true_value,
@@ -158,27 +159,52 @@ def dashboard():
     dates = filtered_df["date"]
     predicted_values = filtered_df["predicted_value"]
     true_values = filtered_df["true_value"]
+    sentiment_scores = filtered_df["avg_score_title"]
 
     # Create the graph data
-    data = [
+    data_stocks = [
         go.Scatter(
             x=dates, y=predicted_values, mode="lines+markers", name="Predicted Value"
         ),
         go.Scatter(x=dates, y=true_values, mode="lines+markers", name="True Value"),
     ]
+    # Create the graph data
+    data_sentiment = [
+        go.Scatter(
+            x=dates, y=sentiment_scores, mode="lines+markers", name="Predicted Value"
+        )
+    ]
+
+    max_abs_sentiment = max(abs(filtered_df["avg_score_title"].min()), abs(filtered_df["avg_score_title"].max()))
+    y_range = [-max_abs_sentiment-0.1, max_abs_sentiment+0.1]
 
     # Create the layout with the company name as the title
-    layout = go.Layout(
+    layout_stocks = go.Layout(
         title=f"{selected_option} Stock Prices",
         xaxis=dict(title="Date"),
         yaxis=dict(title="Price (USD)"),
     )
+    # Create the layout with the company name as the title
+    layout_sentiment = go.Layout(
+        title=f"{selected_option} Sentiment Analysis",
+        xaxis=dict(title="Date"),
+        yaxis=dict(title="Sentmiemt Score",
+                   zeroline=True,
+                    zerolinecolor='gray',
+                    zerolinewidth=1,
+                    range=y_range),
+                    
+    )
 
     # Create the figure with data and layout
-    fig = go.Figure(data=data, layout=layout)
+    fig = go.Figure(data=data_stocks, layout=layout_stocks)
+    # Create the figure with data and layout
+    fig1 = go.Figure(data=data_sentiment, layout=layout_sentiment)
 
     # Convert the figure to JSON
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON1 = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    graphJSON2 = json.dumps(fig1, cls=plotly.utils.PlotlyJSONEncoder)
 
     return render_template(
         "index.html",
@@ -192,7 +218,8 @@ def dashboard():
         prediction=latest_prediction,
         true_value=latest_true_value,
         models=models,
-        graphJSON=graphJSON,
+        graphJSON1=graphJSON1,
+        graphJSON2=graphJSON2,
     )
 
 
