@@ -1,5 +1,3 @@
-name: Lint and Test
-
 on:
   push:
     branches:
@@ -11,9 +9,9 @@ on:
       - testing
 
 jobs:
-  lint_and_test:
-    runs-on: ubuntu-latest
-
+  test:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image to run the pipeline
+ 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
