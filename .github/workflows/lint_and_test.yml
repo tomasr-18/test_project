@@ -31,12 +31,6 @@ jobs:
       env:
         GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
 
-    - name: Export News API key
-      env:
-        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-      run: |
-        echo "NEWS_API_KEY=${NEWS_API_KEY}" >> $GITHUB_ENV
-
     - name: Run Tests
       run: |
         export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
