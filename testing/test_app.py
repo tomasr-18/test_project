@@ -1,5 +1,5 @@
 import os
-import pytest
+#import pytest
 from google.cloud import secretmanager
 from google.auth import default
 from app import get_project_id, get_secret
