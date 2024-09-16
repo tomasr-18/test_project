@@ -1,42 +1,88 @@
-name: Lint and Test
+# name: Lint and Test
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - testing
+#   pull_request:
+#     branches:
+#       - main
+#       - testing
+
+# jobs:
+#   lint_and_test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+
+#     - name: Set up Python
+#       uses: actions/setup-python@v4
+#       with:
+#         python-version: '3.9'
+
+#     - name: Install dependencies
+#       run: |
+#         pip install -r requirements.txt
+#         pip install pytest
+
+#     - name: Set up Google Cloud credentials
+#       run: echo "${{ secrets.BIG_QUERY_SECRET }}" > ${{ github.workspace }}/gcp-key.json
+#       env:
+#         GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
+
+#     - name: Debug JSON content
+#       run: cat ${{ github.workspace }}/gcp-key.json
+
+#     - name: Run Tests
+#       run: |
+#         export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
+#         pytest
+
+
+
+
+
+
 
 on:
   push:
     branches:
       - main
-      - testing
+      - testing  # Trigger tests when code is pushed to 'siwensbranch'
   pull_request:
     branches:
       - main
-      - testing
-
+      - testing  # Trigger tests on pull requests to 'siwensbranch'
+ 
 jobs:
-  lint_and_test:
-    runs-on: ubuntu-latest
-
+  test:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image to run the pipeline
+ 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install pytest
-
-    - name: Set up Google Cloud credentials
-      run: echo "${{ secrets.BIG_QUERY_SECRET }}" > ${{ github.workspace }}/gcp-key.json
-      env:
-        GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.BIG_QUERY_SECRET }}
-
-    - name: Debug JSON content
-      run: cat ${{ github.workspace }}/gcp-key.json
-
-    - name: Run Tests
-      run: |
-        export GOOGLE_APPLICATION_CREDENTIALS="${{ github.workspace }}/gcp-key.json"
-        pytest
+      - name: Checkout code
+        uses: actions/checkout@v2
+ 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # Define the Python version for the pipeline
+ 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requirements.txt
+ 
+      - name: Set up Google Cloud authentication
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: '${{ secrets.BIG_QUERY_SECRET }}'  # Use stored GCP credentials
+ 
+      - name: Run BigQuery Tests
+        env:
+          PROJECT_ID: ${{ secrets.BIG_QUERY_SECRET }}  # Use your GCP project ID stored in secrets
+        run: |
+          pytest
+ 
