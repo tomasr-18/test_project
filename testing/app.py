@@ -12,7 +12,7 @@ def get_project_id():
         # If not set, retrieve the project ID from default credentials
         _, project_id = default()
     return project_id
-
+#hej
 def get_secret(secret_name='bigquery-accout-secret') -> str:
     """Fetches a secret from Google Cloud Secret Manager.
 
