@@ -65,27 +65,42 @@ WITH ranked_predictions AS (
         true_value IS NOT NULL AND
         predicted_value IS NOT NULL AND
         date IS NOT NULL
+),
+latest_asd_per_rp AS (
+    SELECT
+        rp.*,
+        asd.avg_score_title,
+        asd.pub_date,
+        asd.close,
+        ROW_NUMBER() OVER (
+            PARTITION BY rp.company, rp.date
+            ORDER BY asd.pub_date DESC
+        ) AS rn_asd
+    FROM
+        ranked_predictions rp
+    LEFT JOIN
+        `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right` asd
+    ON
+        rp.company = asd.company
+        AND asd.pub_date <= DATE_SUB(rp.date, INTERVAL 1 DAY)
+    WHERE
+        rp.rn = 1
 )
-SELECT 
-    asd.avg_score_title,
-    rp.company,
-    rp.model_name,
-    rp.true_value,
-    rp.predicted_value,
-    rp.date,
-    ROUND(rp.mape, 3) AS mape,
-    ROUND(rp.mae, 3) AS mae,
-    asd.pub_date,
-    asd.close  -- Closing price
-FROM 
-    ranked_predictions rp
-JOIN 
-    `tomastestproject-433206.testdb_1.avg_scores_and_stock_data_right` asd
-ON 
-    rp.company = asd.company  -- Match by company
-    AND asd.pub_date = DATE_SUB(rp.date, INTERVAL 1 DAY)  -- Match where pub_date is 1 day before ranked_predictions.date
-WHERE 
-    rp.rn = 1;
+SELECT
+    avg_score_title,
+    company,
+    model_name,
+    true_value,
+    predicted_value,
+    date,
+    ROUND(mape, 3) AS mape,
+    ROUND(mae, 3) AS mae,
+    pub_date,
+    close
+FROM
+    latest_asd_per_rp
+WHERE
+    rn_asd = 1;
 
         """
 
