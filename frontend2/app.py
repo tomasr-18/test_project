@@ -7,22 +7,13 @@ from google.cloud import secretmanager, bigquery
 
 
 def get_secret(secret_name="bigquery-accout-secret") -> str:
-    """Fetches a secret from Google Cloud Secret Manager.
-
-    Args:
-        secret_name (str): The name of the secret in Secret Manager.
-
-    Returns:
-        str: The secret data as a string.
-    """
+    """Fetches a secret from Google Cloud Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
     project_id = "tomastestproject-433206"
     secret_path = f"projects/{project_id}/secrets/{secret_name}/versions/latest"
     response = client.access_secret_version(name=secret_path)
     secret_data = response.payload.data.decode("UTF-8")
     return secret_data
-
-# Add a new function to fetch the API key from Secret Manager
 
 
 def get_api_key() -> str:
@@ -38,7 +29,6 @@ def get_data_from_bigquery() -> pd.DataFrame:
     query = """
     -- Your BigQuery SQL query here
     """
-
     query_job = client.query(query)
     results = query_job.result()
     df = results.to_dataframe().sort_values("date", ascending=False)
@@ -57,12 +47,20 @@ app = Flask(__name__)
 def require_api_key(func):
     """Decorator to enforce API key authentication."""
     def wrapper(*args, **kwargs):
+        # Fetch API key from headers or query params
         api_key = request.headers.get(
             'x-api-key') or request.args.get('api_key')
         valid_api_key = get_api_key()
 
+        if not api_key:
+            print("API key not provided")  # Log when API key is missing
+            abort(403, description="API key is missing")
+
         if api_key != valid_api_key:
-            abort(403)  # Forbidden
+            # Log when invalid API key is provided
+            print(f"Invalid API key: {api_key}")
+            abort(403, description="Invalid API key")
+
         return func(*args, **kwargs)
     return wrapper
 
