@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnlyBears - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/onlybears.png') }}" alt="OnlyBears Logo">
+            <h2>Dashboard</h2>
+
+        </div>
+        <div class="topbar-stats">
+            <div class="stat" id="latest-run" style="background-color: #17c3b2;">
+                <div class="stat-container">
+                    <h3>Company</h3>
+                    <div class="stat-info">
+                        <p>Name</p>
+                        <form action="/" method="POST" id="dropdownForm">
+                            <select id="dropdown" name="dropdown" onchange="document.getElementById('dropdownForm').submit();">
+                                <option value="TSLA" {% if selected_option == 'TSLA' %} selected {% endif %}>Tesla</option>
+                                <option value="AAPL" {% if selected_option == 'AAPL' %}selected{% endif %}>Apple</option>
+                                <option value="GOOGL" {% if selected_option == 'GOOGL' %}selected{% endif %}>Google</option>
+                                <option value="MSFT" {% if selected_option == 'MSFT' %}selected{% endif %}>Microsoft</option>
+                                <option value="AMZN" {% if selected_option == 'AMZN' %}selected{% endif %}>Amazon</option>
+                            </select>
+                          </form>
+                    </div>
+                </div>
+            </div>
+            <div class="stat" id="latest-run" style="background-color: #17c3b2">
+                <div class="stat-container">
+                    <h3>Model</h3>
+                    <div class="stat-info">
+                        <p>Name</p>
+                        <h2 id="stat-value">{{latest_model_name}}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="stat" id="latest-run" style="background-color: #17c3b2;">
+                <div class="stat-container">
+                    <h3>Prediction</h3>
+                    <div class="stat-info">
+                        <p>{{closing_price}} $</p>
+                        <h2 id="stat-value">{{prediction}} $ - {{prediction_direction}} </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="stat" id="latest-run" style="background-color: #227c9d;">
+                <div class="stat-container">
+                    <h3>Closing Price</h3>
+                    <div class="stat-info">
+                        <p>Price</p>
+                        <h2 id="stat-value">{{true_value}} $</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="stat" id="latest-run" {% if prediction_value == 'Correct' %} 
+            style="background-color: #04e762;" 
+        {% else %} 
+            style="background-color: #f21b3f;" 
+        {% endif %}>
+                <div class="stat-container">
+                    <h3>Prediction Result</h3>
+                    <div class="stat-info">
+                        <p>Value</p>
+                        <h2 id="stat-value">{{prediction_value}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="dash-container" id="model-table">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                              <th scope="col">Model name</th>
+                              <th scope="col">MAE</th>
+                              <th scope="col">MAPE</th>
+                              
+                            </tr>
+                          </thead>
+                        {% for model in models %}
+                        <tr class="table-row">
+                            <td>{{ model.model_name }}</td>
+                            <td>{{ model.mae }}</td>
+                            <td>{{ model.mape }}%</td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+                </div>
+            </div>
+            <div class="dash-container" id="stocks">
+                
+                    <select id="graph-selector">
+                        <option value="graph1">Predictions</option>
+                        <option value="graph2">Sentiment</option>
+                    </select>
+                
+                <div id="plotly-graph"></div>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        var graphs = {
+            graph1: {{ graphJSON1 | safe }},
+            graph2: {{ graphJSON2 | safe }},
+            // Add more graphs as needed
+        };
+    
+        function updateGraph(selectedGraph) {
+            Plotly.react('plotly-graph', graphs[selectedGraph]);
+        }
+    
+        document.getElementById('graph-selector').addEventListener('change', function() {
+            updateGraph(this.value);
+        });
+    
+        // Initialize with the first graph
+        updateGraph('graph1');
+    </script>
+</body>
+</html>
